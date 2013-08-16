@@ -1,0 +1,56 @@
+###################
+#Installing CanSNPer
+###################
+CanSNPer is written in Python and requires Python installed as well as several 
+dependencies listed below. The software is developed and tested with Python 
+version 2.7 but earlier (2.5, 2.6) may work just as well. Due to other 
+dependencies other versions of Python are not supported.
+
+When the dependencies are all installed CanSNPer can be run as it is from the 
+shell. To be able to easily access it in the future, place CanSNPer and the 
+CanSNPer.conf configuration file in a directory in your PATH.
+
+To begin with, try:
+
+$ ./CanSNPer --help
+
+If there are no errors and you see the help text printed, CanSNPer is working 
+correctly and you can go on to do your analysis.
+
+More on how to run CanSNPer in its various modes can be found in the README 
+file that came with the distribution.
+
+CanSNPer has only been tested on Linux, but feel free to tinker with setting up 
+a working version on your favorite OS.
+
+###################
+#Dependencies
+###################
+Software that must be installed before running CanSNPer:
+
+-------------------
+Python (2.7.X)
+-------------------
+	http://www.python.org/getit/
+	Most Linux distributions come with Python installed.
+
+-------------------
+Python package ETE2
+-------------------
+	http://ete.cgenomics.org/
+	ETE2 has a number of dependencies as listed in their install notes.
+
+-------------------
+progressiveMauve
+-------------------
+	http://gel.ahabs.wisc.edu/mauve/
+	The progressiveMauve binary must be in the PATH or specifically set in 
+	the CanSNPer.conf file.
+
+-------------------
+x2fa.py
+-------------------
+	Supplied with the CanSNPer distribution.
+	The x2fa.py script must be in the PATH or specifically set in the 
+	CanSNPer.conf file. x2fa.py can be used separately to convert XMFA files to 
+	fasta format.

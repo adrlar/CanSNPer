@@ -1,0 +1,178 @@
+###################
+#Running CanSNPer
+###################
+All CanSNPer runs start with the main CanSNPer script, assuming it is in your 
+PATH, try to invoke the CanSNPer help with this command:
+
+$ CanSNPer -h
+
+Sometimes CanSNPer will want more information from you, such as the name of the 
+organism you want to use as a reference when aligning. This is done by a prompt 
+where you type the answer in and press enter to submit. If you are ever stuck 
+in a prompt or dont know what to enter, type 'exit' to exit.
+
+###################
+#Running the usual analysis
+###################
+CanSNPer takes a fasta file as input, using the argument -i or --snp_type_file 
+with the file name:
+
+$ CanSNPer --snp_type_file /path/to/fasta.fa
+
+CanSNPer will give you an option to choose which reference organism you want to 
+use. If you want to give the reference as a command line argument, use 
+--reference or -r followed by the reference name as it is in the database
+
+$ CanSNPer -i /path/to/fasta.fa -r Francisella_tularensis
+
+If you want to change the output of CanSNPer use the arguments --tab_sep (-t), 
+--draw_tree (-d), --list_snps (-l) or --verbose (-v). The following command 
+will type fasta.fa with Y. pestis as reference, print the outcome in a tab 
+separated format, create a text file with all SNPs listed, draw a canSNP tree 
+and save it as a PDF file and CanSNPer will print whatever it is doing (because 
+we used all the -t, -l, -d and -v options):
+
+$ CanSNPer -i fasta.fa -r Yersinia_pestis -tldv
+
+###################
+#Threads
+###################
+CanSNPer is fairly lightweight in terms of how much computational power it 
+needs. The only part of the analysis that can take time is the alignment, if 
+there are several reference strains to align to (as in the case of Fracisella 
+tularensis). Therefore the alignment of the query to each reference are all 
+assigned their own thread, unless the user specifies a MAXIMUM number of 
+threads to use. The default value is no limit (0).
+
+$ CanSNPer -i fasta.fa -r Yersinia_pestis -n2
+
+###################
+#The --allow_differences argument
+###################
+This argument allows CanSNPer to pass through a number of canSNP tree nodes 
+even if the SNP is not in a derived state. The number of nodes that are 
+permitted to be wrong is stated after --allow_differences. This option can be 
+useful if you know there is a specific part of the sequence missing and that 
+this will cause CanSNPer to overlook information. Use this option only if you 
+are certain of the effects on the outcome. Here is an example:
+
+$ CanSNPer -i BROKEN.fa --allow_differences 1
+
+This will produce a warning, in addition to the classification, letting you 
+know which SNPs were not in the derived state with the canSNP tree:
+
+Classification of BROKEN.fa: B.24
+#[WARNING] these SNPs were not in the derived state: B.3
+
+###################
+#Configuring CanSNPer.conf
+###################
+The configuration file, by default called CanSNPer.conf is a text file 
+containing all settings and by default CanSNPer will look for it in the folder 
+where CanSNPer is run from. You can also specify the location of the 
+configuration file on the command line with the -c or --config_file argument as 
+such:
+
+$ CanSNPer --config_file /path/to/CanSNPer.conf
+
+With no configuration file CanSNPer will try with its default settings and you 
+will get a warning like this:
+
+#[WARNING] No config file found: [Errno X] ...
+
+For instructions on what to write in the CanSNPer.conf file, see the existing 
+file that came with the distribution of CanSNPer.
+
+###################
+#Setting up, or changing a CanSNPer database
+###################
+A database complete with the current information is available with the CanSNPer 
+distribution, but if you want to create a separate DB, or add to yours, here 
+are some CanSNPer command line arguments that will help. The formatting of the 
+SNP text file and the tree text file is explained in another section of this 
+README.
+
+The SQLite database file will be created automatically in the location 
+specified in CanSNPer.conf (default is in your home folder). When you want to 
+add a new organism to your database, use the -initialise_organism argument:
+
+$ CanSNPer -initialise_organism
+
+CanSNPer will ask for an organism name if you did not supply one using the -r 
+argument.
+
+After initialising an organism you can start to add information to it. To add 
+the list of SNPs use the --import_snp_file argument and supply the text-file. 
+If you did not supply the -r argument CanSNPer will ask which organism this 
+data belongs to.
+
+$ CanSNPer -r Yersinia_pestis --import_snp_file y_snps.txt
+
+Next, if you want to upload a new, or update an existingcanSNP tree, use 
+--import_tree_file:
+
+$ CanSNPer -r Yersinia_pestis --import_tree_file y_tree.txt
+
+The last database altering option in CanSNPer allows you to import a fasta 
+sequence to the SQLite database. A sequence file has to be imported for each of 
+the reference strains that are used in the SNP table. You can only import one 
+at a time, though:
+
+$ CanSNPer -r Yersinia_pestis --import_seq_file CO92.fa
+
+With the --import_seq_file argument you can also add the --strain_name and tell 
+CanSNPer what the strain name is without having to go through the prompt:
+
+$ CanSNPer -r Yersinia_pestis --import_seq_file CO92.fa \
+	--strain_name CO92
+
+###################
+#Formatting a canSNP tree text file for CanSNPer
+###################
+The format that CanSNPer accepts as a tree is very simple.
+1. The first line MUST contain the root of the tree.
+2. All subsequent lines represent one intermediate or leaf node in the tree. It 
+is listed with all its ancestors in order, separated by semi-colons, with the 
+node name at the end.
+
+This formatting creates a tree that is easy to inspect in text form, in any 
+editor.
+
+Here is an example tree:
+
+Root
+Root;SNP1
+Root;SNP1;SNP3
+Root;SNP1;SNP4
+Root;SNP1;SNP4;SNP5
+Root;SNP2
+
+The only node with a positional requirement, in terms of line number, is the 
+root, and while it doesnt exactly make much sense to write it like this, the 
+following tree is also valid:
+
+Root
+Root;SNP1;SNP4;SNP5
+Root;SNP1;SNP4
+Root;SNP1
+Root;SNP2
+Root;SNP1;SNP3
+
+###################
+#Formatting a SNP list text file for CanSNPer
+###################
+The SNP list is a tab separated text file and must have the information in the 
+following order: SNP name, Organism name, Reference, Strain, Position, Derived 
+base, Ancestral base
+
+Here is an example:
+B.1	Francisella	Svensson	LVS	23942	A	G
+
+The header line is not needed and any line beginning with a '#' will be 
+considered a comment line. The order of derived and ancestral state is of 
+particular importance because there is no way for CanSNPer to tell the columns 
+apart.
+
+The column Organism name is not used by CanSNPer at this moment, but is kept in 
+order to ease any future work with the file formats and import functions. It 
+can be left out, but there must then be two tabs between SNP name and Reference.
