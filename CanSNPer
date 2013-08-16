@@ -48,7 +48,7 @@ def parse_arguments():
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
 	
-	If you are stuck in a prompt and don't know what to do, type exit to exit.
+	If you are stuck in a prompt and don't know what to do, type 'exit' to exit.
 	'''
 	#Parse command line arguments
 	parser = argparse.ArgumentParser(description=cansnper_description)
