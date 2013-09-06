@@ -11,6 +11,9 @@ organism you want to use as a reference when aligning. This is done by a prompt
 where you type the answer in and press enter to submit. If you are ever stuck 
 in a prompt or dont know what to enter, type 'exit' to exit.
 
+Note that not all information that CanSNPer needs can be given interactively.
+File names can only be given as a command argument.
+
 ###################
 #Running the usual analysis
 ###################
@@ -21,7 +24,7 @@ $ CanSNPer --snp_type_file /path/to/fasta.fa
 
 CanSNPer will give you an option to choose which reference organism you want to 
 use. If you want to give the reference as a command line argument, use 
---reference or -r followed by the reference name as it is in the database
+--reference or -r followed by the reference name.
 
 $ CanSNPer -i /path/to/fasta.fa -r Francisella_tularensis
 
@@ -38,11 +41,11 @@ $ CanSNPer -i fasta.fa -r Yersinia_pestis -tldv
 #Threads
 ###################
 CanSNPer is fairly lightweight in terms of how much computational power it 
-needs. The only part of the analysis that can take time is the alignment, if 
-there are several reference strains to align to (as in the case of Fracisella 
-tularensis). Therefore the alignment of the query to each reference are all 
-assigned their own thread, unless the user specifies a MAXIMUM number of 
-threads to use. The default value is no limit (0).
+needs. However, If there are several reference strains to align to (as in the 
+case of Fracisella tularensis) the alignments of the query to each reference 
+are all assigned their own thread. That is, unless the user specifies a 
+MAXIMUM number of threads to use. The default value is no limit (0). This 
+option is called -n.
 
 $ CanSNPer -i fasta.fa -r Yersinia_pestis -n2
 
@@ -58,8 +61,8 @@ are certain of the effects on the outcome. Here is an example:
 
 $ CanSNPer -i BROKEN.fa --allow_differences 1
 
-This will produce a warning, in addition to the classification, letting you 
-know which SNPs were not in the derived state with the canSNP tree:
+This may produce a warning, in addition to the classification, letting you 
+know which SNPs (if any) were not in the derived state in the canSNP tree:
 
 Classification of BROKEN.fa: B.24
 #[WARNING] these SNPs were not in the derived state: B.3
@@ -80,7 +83,7 @@ will get a warning like this:
 
 #[WARNING] No config file found: [Errno X] ...
 
-For instructions on what to write in the CanSNPer.conf file, see the existing 
+For instructions on what to write in the CanSNPer.conf file, see the example 
 file that came with the distribution of CanSNPer.
 
 ###################
@@ -109,7 +112,7 @@ data belongs to.
 $ CanSNPer -r Yersinia_pestis --import_snp_file y_snps.txt
 
 Next, if you want to upload a new, or update an existingcanSNP tree, use 
---import_tree_file:
+--import_tree_file. The tree in the CanSNPer database will be replaced:
 
 $ CanSNPer -r Yersinia_pestis --import_tree_file y_tree.txt
 
@@ -148,7 +151,7 @@ Root;SNP1;SNP4;SNP5
 Root;SNP2
 
 The only node with a positional requirement, in terms of line number, is the 
-root, and while it doesnt exactly make much sense to write it like this, the 
+root and while it doesnt exactly make much sense to write it like this, the 
 following tree is also valid:
 
 Root

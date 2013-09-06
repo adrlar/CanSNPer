@@ -21,7 +21,7 @@ More on how to run CanSNPer in its various modes can be found in the README
 file that came with the distribution.
 
 CanSNPer has only been tested on Linux, but feel free to tinker with setting up 
-a working version on your favorite OS.
+a working version on your favorite OS. Mauve is available on other platforms.
 
 ###################
 #Dependencies
@@ -38,7 +38,8 @@ Python (2.7.X)
 Python package ETE2
 -------------------
 	http://ete.cgenomics.org/
-	ETE2 has a number of dependencies as listed in their install notes.
+	ETE2 has a number of additional dependencies, listed in their install 
+	notes.
 
 -------------------
 progressiveMauve
