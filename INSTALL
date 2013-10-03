@@ -39,8 +39,15 @@ Python package ETE2
 -------------------
 	http://ete.cgenomics.org/
 	ETE2 has a number of additional dependencies, listed in their install 
-	notes.
+	notes. Most notably, there are several dependencies that are not needed 
+	for CanSNPer, but they may raise warnings as ETE2 is loaded.
 
+-------------------
+Python package NumPy
+-------------------
+	http://www.numpy.org/
+	Simple install instructions are available for this package.
+	
 -------------------
 progressiveMauve
 -------------------

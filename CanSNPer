@@ -199,7 +199,7 @@ def read_config(args):
 	
 
 	if config["dev"]: #Developer printout
-		print "#[DEV] configurations:\n%s\n"%config
+		print "#[DEV] configurations:%s"%config
 	return config
 
 
@@ -276,7 +276,7 @@ def select_strain(db_name):
 		print "%s" % row[0].strip()
 		strain_list.append(row[0].strip())
 	while True:
-		strain_name = raw_input('Choose strain: ')
+		strain_name = raw_input('Choose strain name to link to this file: ')
 		if strain_name in strain_list: #Spell-check!
 			break
 		elif strain_name.strip().lower() == "exit":
@@ -460,13 +460,13 @@ def import_tree(file_name):
 				if nodes[i] != "":
 					c.execute("SELECT Name FROM Tree WHERE Name = ? AND Organism = ?", (nodes[i],organism_name))
 					if c.fetchone():
-						if len(nodes) > i+1:
+						if len(nodes) > i+1: #Looking for children
 							c.execute("SELECT Children FROM Tree WHERE Name = ?", (nodes[i],))
 							children = c.fetchone()[0]
 							if children:
 								child_list = children.split(";")
 								if nodes[i+1] in child_list:
-									pass
+									pass #Already listed as a child, skip
 								else: #Append child
 									new_children = ";".join(child_list) + ";" + nodes[i+1]
 									c.execute("UPDATE Tree SET Children = ? WHERE Name = ? AND Organism = ?",
@@ -474,8 +474,11 @@ def import_tree(file_name):
 							else:
 								c.execute("UPDATE Tree SET Children = ? WHERE Name = ? AND Organism = ?",
 									(nodes[i+1],nodes[i],organism_name))	
-					else:
-						c.execute("INSERT INTO Tree VALUES(?,?,?)", (nodes[i], None, organism_name))
+					else: #Add a node
+						if len(nodes) > i+1 and nodes[i+1] != "": #First check if its got children
+							c.execute("INSERT INTO Tree VALUES(?,?,?)", (nodes[i], nodes[i+1], organism_name))
+						else:
+							c.execute("INSERT INTO Tree VALUES(?,?,?)", (nodes[i], None, organism_name))
 
 def tree_to_newick(organism):
 	'''Returns a tree in the SQLite3 database in newick format
@@ -508,7 +511,7 @@ def tree_to_newick(organism):
 					nodes.remove(node)
 				else:
 					nodes.remove(node) #Just remove the node from the list if it doesnt have children
-			elif result == '': # If result is empty, add the node. This is the root
+			elif result == '': # If result is empty, just add the node. This is the root!
 				if node[1]:
 					result += "(%s)%s;"%(node[1].replace(";", ","), node[0])
 					nodes.remove(node)
@@ -517,7 +520,12 @@ def tree_to_newick(organism):
 					nodes.remove(node)
 		count += 1
 	if count > 9999: #Could not insert all nodes into the tree
-		stderr.write("#[WARNING] Broken tree, cannot convert entire tree to newick format")
+		stderr.write("#[WARNING] Broken tree, cannot convert entire tree to newick format. "+\
+			"Most likely reason is a non-root node not listed as a child anywhere in the tree\n")
+		if config["dev"]:
+			print "#[DEV] These nodes were left out of the tree: %s"%str(nodes)
+	if config["dev"]:
+		print "#[DEV] Tree in newick format:%s"%result
 	return result
 
 
@@ -599,7 +607,7 @@ def find_tree_root(db_name):
 			root = node[0] # Set it as root
 			break
 	if config["dev"]: #Developer printout
-		print "#[DEV] root %s tree: %s\n"%(db_name, root)
+		print "#[DEV] root %s tree: %s"%(db_name, root)
 	if not root:
 		exit("Error: Could not find root of %s tree"%db_name)
 	return root
@@ -799,7 +807,8 @@ def align(file_name):
 			command = "%s %s.%s.xmfa %s/CanSNPer_reference_sequence.%s.fa "%(config["x2fa_path"],
 				output, seq_uids[i], config["tmp_path"], seq_uids[i]) +\
 				"0 %s.%s.fa 2> %s/CanSNPer_xerr%s.txt"%(output, fasta_name, config["tmp_path"], seq_uids[i])
-			#print command
+			if config["dev"]:
+				print "#[DEV] x2fa command:%s"%command
 			x2f_jobs.append(multiprocessing.Process(target=run_command,
 				args=(command,)))
 		for i in range(0, len(x2f_jobs)): #Start the jobs

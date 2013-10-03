@@ -149,8 +149,11 @@ if __name__ == "__main__":
 					start = pos
 					end = pos + rmH[alignment][pos]
 					for sequence in aGen[alignment].keys():
+						if flank > 0:
+							new_start = max(0, start-1)
+							new_end = min(len(aGen[alignment][sequence]["seq"]), start+1)
+							aGen[alignment][sequence]["seq"][new_start:new_end] = bytearray("-"*(new_end-new_start))
 						aGen[alignment][sequence]["seq"] = aGen[alignment][sequence]["seq"][:start] + aGen[alignment][sequence]["seq"][end:]
-
 	#Go through all the alignment blocks and add the sequence to the output bytearrays
 	for alignment in aGen.keys():
 		if aGen[alignment][reference_num]["sign"] == "+":
@@ -159,14 +162,21 @@ if __name__ == "__main__":
 				start = int(aGen[alignment][reference_num]["p1"])-1
 				end = int(aGen[alignment][reference_num]["p2"])
 				if start >= 0 and end > 0 and aGen[alignment][sequence]["seq"]:
-					outseqs[sequence][start:end] = aGen[alignment][sequence]["seq"]
+					if flank > 0:
+						outseqs[sequence][start+flank:end-flank] = bytearray(str(aGen[alignment][sequence]["seq"]), encoding="utf8")[flank:-flank]
+					else:
+						outseqs[sequence][start:end] = bytearray(str(aGen[alignment][sequence]["seq"]), encoding="utf8")
+
 		else:
 			#Add reverse complement to outseqs
 			for sequence in aGen[alignment].keys():
 				start = int(aGen[alignment][reference_num]["p1"])-1
 				end = int(aGen[alignment][reference_num]["p2"])
 				if start >= 0 and end > 0 and aGen[alignment][sequence]["seq"]:
-					outseqs[sequence][start:end] = bytearray(reverse_complement(str(aGen[alignment][sequence]["seq"])), encoding="utf8")
+					if flank > 0:
+						outseqs[sequence][start+flank:end-flank] = bytearray(reverse_complement(str(aGen[alignment][sequence]["seq"])), encoding="utf8")[flank:-flank]
+					else:
+						outseqs[sequence][start:end] = bytearray(reverse_complement(str(aGen[alignment][sequence]["seq"])), encoding="utf8")
 	
 	#If a screening flank was set, do the screening
 	if flank > 0:

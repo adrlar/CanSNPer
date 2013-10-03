@@ -123,6 +123,9 @@ at a time, though:
 
 $ CanSNPer -r Yersinia_pestis --import_seq_file CO92.fa
 
+CanSNPer list the reference strains that are in the SNP list, and you choose 
+one of them to link to the sequence you are uploading.
+
 With the --import_seq_file argument you can also add the --strain_name and tell 
 CanSNPer what the strain name is without having to go through the prompt:
 
