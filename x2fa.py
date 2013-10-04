@@ -19,10 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 #Apologies for the perl-esque way of coding.
 #I updated a perl script and tried to copy it line for line.
-#VERSION 8
+#VERSION 9
+#Updates for v9:
+#Changed the way screening of flanks is done. Fixed a bug where it sometimes messed
+#the length of the alignment up.
 #Updates for v8:
 #Saves strings in the form of bytearrays. The immutability of python strings
-#make the process of changing strings a lot inefficient (which is how this implementation works).
+#make the process of changing strings inefficient (which is how this implementation works).
 #Using the bytearrays, the program runs a lot faster, especially when screening deletion flanks.
 import re
 import os
@@ -154,52 +157,46 @@ if __name__ == "__main__":
 							new_end = min(len(aGen[alignment][sequence]["seq"]), start+1)
 							aGen[alignment][sequence]["seq"][new_start:new_end] = bytearray("-"*(new_end-new_start))
 						aGen[alignment][sequence]["seq"] = aGen[alignment][sequence]["seq"][:start] + aGen[alignment][sequence]["seq"][end:]
+			if flank > 0:
+				list_of_gaps = list()
+				for sequence in aGen[alignment].keys():
+					if sequence == reference_num:
+						continue
+					sequence_search_string = str(aGen[alignment][sequence]["seq"])
+					while search_pos < length_of_reference:
+						gap_hit = pattern_gap.search(sequence_search_string, search_pos)
+						if gap_hit: #Looking for gaps in the non-references
+							list_of_gaps.append([gap_hit.start(), gap_hit.end()])
+							search_pos = gap_hit.end()
+						else:
+							break
+				for non_ref_gap in list_of_gaps:
+					for sequence in aGen[alignment].keys():
+						aGen[alignment][sequence]["seq"][non_ref_gap[0]:non_ref_gap[1]] = bytearray("-"*(non_ref_gap[1]-non_ref_gap[0]))
 	#Go through all the alignment blocks and add the sequence to the output bytearrays
 	for alignment in aGen.keys():
+		start = int(aGen[alignment][reference_num]["p1"])-1
+		end = int(aGen[alignment][reference_num]["p2"])
+		if flank > 0:
+			start += flank
+			end -= flank
 		if aGen[alignment][reference_num]["sign"] == "+":
 			#Add sequence to outseqs
 			for sequence in aGen[alignment].keys():
-				start = int(aGen[alignment][reference_num]["p1"])-1
-				end = int(aGen[alignment][reference_num]["p2"])
 				if start >= 0 and end > 0 and aGen[alignment][sequence]["seq"]:
 					if flank > 0:
-						outseqs[sequence][start+flank:end-flank] = bytearray(str(aGen[alignment][sequence]["seq"]), encoding="utf8")[flank:-flank]
+						outseqs[sequence][start:end] = bytearray(str(aGen[alignment][sequence]["seq"][flank:-flank]), encoding="utf8")
 					else:
 						outseqs[sequence][start:end] = bytearray(str(aGen[alignment][sequence]["seq"]), encoding="utf8")
-
 		else:
 			#Add reverse complement to outseqs
 			for sequence in aGen[alignment].keys():
-				start = int(aGen[alignment][reference_num]["p1"])-1
-				end = int(aGen[alignment][reference_num]["p2"])
 				if start >= 0 and end > 0 and aGen[alignment][sequence]["seq"]:
 					if flank > 0:
-						outseqs[sequence][start+flank:end-flank] = bytearray(reverse_complement(str(aGen[alignment][sequence]["seq"])), encoding="utf8")[flank:-flank]
+						outseqs[sequence][start:end] = bytearray(reverse_complement(str(aGen[alignment][sequence]["seq"][flank:-flank])), encoding="utf8")
 					else:
 						outseqs[sequence][start:end] = bytearray(reverse_complement(str(aGen[alignment][sequence]["seq"])), encoding="utf8")
 	
-	#If a screening flank was set, do the screening
-	if flank > 0:
-		list_of_gaps = list()
-		for sequence in outseqs.keys(): #Find all gaps in all sequences
-			search_pos = 0
-			while search_pos < length_of_reference:
-				gap_hit = pattern_gap.search(outseqs[sequence], search_pos)
-				if gap_hit:
-					hit_start = gap_hit.start()-flank
-					hit_end = gap_hit.end()+flank
-					if hit_start < 0:
-						hit_start = 0
-					if hit_end > len(outseqs[sequence]):
-						hit_end = len(outseqs[sequence])
-					list_of_gaps.append([hit_start, hit_end])
-					search_pos = gap_hit.end()
-				else:
-					break
-		for sequence in outseqs.keys(): #Extend the gaps even in sequences that did not have them
-			for gap in list_of_gaps:
-				outseqs[sequence][gap[0]:gap[1]] = bytearray("-"*(gap[1]-gap[0]), encoding="utf8")
-
 	#First, write the reference sequence
 	outfile.write(">"+num2name[reference_num]+"\n")
 	seqpos = 0
