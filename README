@@ -1,7 +1,7 @@
 ###################
 #Running CanSNPer
 ###################
-All CanSNPer runs start with the main CanSNPer script, assuming it is in your 
+All CanSNPer runs start with the main CanSNPer script. Assuming it is in your 
 PATH, try to invoke the CanSNPer help with this command:
 
 $ CanSNPer -h

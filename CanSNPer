@@ -4,6 +4,8 @@
 CanSNPer: A toolkit for SNP-typing using NGS data.
 Copyright (C) 2013 Adrian Lärkeryd
 
+VERSION 1.00
+
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
@@ -39,6 +41,7 @@ def parse_arguments():
 	'''Parses arguments from the command line and sends them to read_config
 
 	'''
+	
 	cansnper_description = '''
 	CanSNPer: A toolkit for SNP-typing using NGS data.
 	Copyright (C) 2013 Adrian Lärkeryd.
@@ -54,7 +57,7 @@ def parse_arguments():
 	parser = argparse.ArgumentParser(description=cansnper_description)
 	parser.add_argument("-r", "--reference",
 		help="the name of the organism")
-	parser.add_argument("-i", "--snp_type_file",
+	parser.add_argument("-i", "--query",
 		help="fasta sequence file name that is to be analysed")
 	parser.add_argument("-c", "--config_file",
 		help="path to a CanSNPer configuration file")
@@ -106,6 +109,8 @@ def read_config(args):
 	'''
 	user = getpass.getuser()
 	
+	version = 1.00
+	
 	config_list = {"tmp_path":"string","db_path":"string","mauve_path":"string",
 		"x2fa_path":"string","num_threads":"int","verbose":"boolean","allow_differences":"int",
 		"save_align":"boolean","draw_tree":"boolean","list_snps":"boolean","reference":"string",
@@ -148,7 +153,7 @@ def read_config(args):
 							argument_value = True
 						else:
 							argument_value = False
-					if "path" in argument_name:
+					if argument_name == "tmp_path":
 						argument_value = argument_value + "/"
 					config[argument_name] = argument_value
 		config_file_open.close()
@@ -168,8 +173,8 @@ def read_config(args):
 		config["dev"] = True
 	if args.reference:
 		config["reference"] = args.reference
-	if args.snp_type_file:
-		config["query"] = args.snp_type_file
+	if args.query:
+		config["query"] = args.query
 	if args.import_tree_file:
 		config["import_tree_file"] = args.import_tree_file
 	if args.import_snp_file:
@@ -200,6 +205,8 @@ def read_config(args):
 
 	if config["dev"]: #Developer printout
 		print "#[DEV] configurations:%s"%config
+	if config["verbose"]:
+		print "#Version: %0.2f"%version
 	return config
 
 
@@ -903,9 +910,14 @@ if __name__ == '__main__':
 	config = parse_arguments()
 	
 	#Open sqlite3 connection
-	cnx = sqlite3.connect(config["db_path"])
-	c = cnx.cursor()
-	
+	if not path.isfile(config["db_path"]):
+		print "Trying to create new database at %s"%config["db_path"]
+	try:
+		cnx = sqlite3.connect(config["db_path"])
+		c = cnx.cursor()
+	except sqlite3.OperationalError as e:
+		exit("#[ERROR] Could not open database at %s:\n%s"%(config["db_path"], str(e)))
+
 	#Run the apropriate functions
 	if config["initialise_organism"]:
 		initialise_table()
