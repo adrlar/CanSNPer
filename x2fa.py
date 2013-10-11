@@ -153,8 +153,8 @@ if __name__ == "__main__":
 					end = pos + rmH[alignment][pos]
 					for sequence in aGen[alignment].keys():
 						if flank > 0:
-							new_start = max(0, start-1)
-							new_end = min(len(aGen[alignment][sequence]["seq"]), start+1)
+							new_start = max(0, start-flank)
+							new_end = min(len(aGen[alignment][sequence]["seq"]), end+flank)
 							aGen[alignment][sequence]["seq"][new_start:new_end] = bytearray("-"*(new_end-new_start))
 						aGen[alignment][sequence]["seq"] = aGen[alignment][sequence]["seq"][:start] + aGen[alignment][sequence]["seq"][end:]
 			if flank > 0:
@@ -172,7 +172,9 @@ if __name__ == "__main__":
 							break
 				for non_ref_gap in list_of_gaps:
 					for sequence in aGen[alignment].keys():
-						aGen[alignment][sequence]["seq"][non_ref_gap[0]:non_ref_gap[1]] = bytearray("-"*(non_ref_gap[1]-non_ref_gap[0]))
+						new_start = max(0, non_ref_gap[0]-flank)
+						new_end = min(non_ref_gap[1]+flank, len(aGen[alignment][sequence]["seq"]))
+						aGen[alignment][sequence]["seq"][new_start:new_end] = bytearray("-"*(new_end - new_start))
 	#Go through all the alignment blocks and add the sequence to the output bytearrays
 	for alignment in aGen.keys():
 		start = int(aGen[alignment][reference_num]["p1"])-1
