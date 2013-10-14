@@ -1,14 +1,14 @@
 #SNP	Organism	Reference	Strain	Position	Derived_base	Ancestral_base
-A.Br.001	Bacillus	Van Ert	Ames	182106	C	T
-A.Br.002	Bacillus	Van Ert	Ames	947759	T	G
-A.Br.003	Bacillus	Van Ert	Ames	1493157	C	T
-A.Br.004	Bacillus	Van Ert	Ames	3600659	C	T
-A.Br.006	Bacillus	Van Ert	Ames	162509	A	C
-A.Br.007	Bacillus	Van Ert	Ames	266439	G	A
-A.Br.008	Bacillus	Van Ert	Ames	3947248	C	A
-A.Br.009	Bacillus	Van Ert	Ames	2589823	G	A
-B.Br.001	Bacillus	Van Ert	Ames	1455279	G	A
-B.Br.002	Bacillus	Van Ert	Ames	1056740	A	C
-B.Br.003	Bacillus	Van Ert	Ames	1494269	A	G
-B.Br.004	Bacillus	Van Ert	Ames	69952	C	T
-A/B.Br.001	Bacillus	Van Ert	Ames	3697886	A	G
+A.Br.001	Bacillus_anthracis	Van Ert	Ames	182106	C	T
+A.Br.002	Bacillus_anthracis	Van Ert	Ames	947759	T	G
+A.Br.003	Bacillus_anthracis	Van Ert	Ames	1493157	C	T
+A.Br.004	Bacillus_anthracis	Van Ert	Ames	3600659	C	T
+A.Br.006	Bacillus_anthracis	Van Ert	Ames	162509	A	C
+A.Br.007	Bacillus_anthracis	Van Ert	Ames	266439	G	A
+A.Br.008	Bacillus_anthracis	Van Ert	Ames	3947248	C	A
+A.Br.009	Bacillus_anthracis	Van Ert	Ames	2589823	G	A
+B.Br.001	Bacillus_anthracis	Van Ert	Ames	1455279	G	A
+B.Br.002	Bacillus_anthracis	Van Ert	Ames	1056740	A	C
+B.Br.003	Bacillus_anthracis	Van Ert	Ames	1494269	A	G
+B.Br.004	Bacillus_anthracis	Van Ert	Ames	69952	C	T
+A/B.Br.001	Bacillus_anthracis	Van Ert	Ames	3697886	A	G
