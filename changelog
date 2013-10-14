@@ -1,0 +1,11 @@
+2013-10-14  Adrian Lärkeryd  <adrian.larkeryd@foi.se>
+	
+	CanSNPer version 1.01
+	* (parse_arguments) 
+	Print help if no arguments were sent to CanSNPer
+	* (purge_organism) 
+	Make sure the user wants to delete organism by asking
+	
+2013-10-10  Adrian Lärkeryd <adrian.larkeryd@foi.se>
+
+	CanSNPer version 1.00

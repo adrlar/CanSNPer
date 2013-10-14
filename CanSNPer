@@ -19,7 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
-from sys import stderr
+from sys import stderr, argv
 from os import path, remove, makedirs, getcwd
 from shutil import copy as shutil_copy
 from uuid import uuid4
@@ -91,6 +91,12 @@ def parse_arguments():
 	parser.add_argument("-initialise_organism", action="store_true",
 		help="initialise a new table for an organism")
 	parser.add_argument("-q", "--dev", action="store_true", help="dev mode")
+	
+	#Exit and print help if there were no arguments
+	if len(argv) == 1:
+		parser.print_help()
+		exit()
+
 	args = parser.parse_args()
 
 	#Send the command line arguments to read_config,
@@ -343,10 +349,12 @@ def initialise_table():
 def purge_organism():
 	'''Removes everything in the SQLite3 database connected to a organism.'''
 	db_name = get_organism()
-	c.execute("DROP TABLE %s"%db_name)
-	c.execute("DELETE FROM Sequences WHERE Organism = ?", (db_name, ))
-	c.execute("DELETE FROM Tree WHERE Organism = ?", (db_name, ))
-
+	if raw_input("Delete everything concerning %s? (Y/N) "%db_name).lower()[0] == "y":
+		c.execute("DROP TABLE %s"%db_name)
+		c.execute("DELETE FROM Sequences WHERE Organism = ?", (db_name, ))
+		c.execute("DELETE FROM Tree WHERE Organism = ?", (db_name, ))
+	else:
+		exit("#Nothing happened, promise.")
 
 def import_sequence(file_name):
 	'''Loads a fasta file into the SQLite3 database.
@@ -398,6 +406,7 @@ def import_sequence(file_name):
 
 def import_to_db(file_name):
 	'''Imports a textfile of SNP information into the SQLite3 database.
+	Lines beginning with # are considered comment lines.
 
 	Keyword arguments:
 	file_name -- the file name of the file containing the SNP info
@@ -415,7 +424,7 @@ def import_to_db(file_name):
 	
 	queries = []
 	for line in snp_file.readlines():
-		if line[0] != "#" and line != "":
+		if line != "" and line[0] != "#":
 			line = line.strip()
 			values = line.split("\t")
 			snpname = values[0].strip()
@@ -424,10 +433,10 @@ def import_to_db(file_name):
 				if len(values) == 7:
 					c.execute("UPDATE %s SET Reference = ?, Strain = ?, Position = ?, Derived_base = ?, Ancestral_base = ? WHERE SNP = ?"%db_name, 
 						(values[2].strip(), values[3].strip(), int(values[4].strip()),
-						values[5].strip(), values[6].strip(), values[0].strip()))
+						values[5].strip(), values[6].strip(), snpname))
 			else:
 				if len(values) == 7:
-					queries.append((values[0].strip(), values[2].strip(), values[3].strip(),
+					queries.append((snpname, values[2].strip(), values[3].strip(),
 						int(values[4].strip()), values[5].strip(), values[6].strip()))
 				else: #Skip line if one of the pieces of information is missing
 					print "#Skipping:", values
