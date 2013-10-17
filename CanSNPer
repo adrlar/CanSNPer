@@ -4,7 +4,7 @@
 CanSNPer: A toolkit for SNP-typing using NGS data.
 Copyright (C) 2013 Adrian Lärkeryd
 
-VERSION 1.01
+VERSION 1.02
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -115,7 +115,7 @@ def read_config(args):
 	'''
 	user = getpass.getuser()
 	
-	version = 1.01
+	version = 1.02
 	
 	config_list = {"tmp_path":"string","db_path":"string","mauve_path":"string",
 		"x2fa_path":"string","num_threads":"int","verbose":"boolean","allow_differences":"int",
@@ -427,17 +427,20 @@ def import_to_db(file_name):
 		if line != "" and line[0] != "#":
 			line = line.strip()
 			values = line.split("\t")
-			snpname = values[0].strip()
+			unicode_values = list()
+			for value in values:
+				unicode_values.append(unicode(value.strip(), encoding="utf8"))
+			snpname = unicode_values[0]
 			c.execute("SELECT SNP from %s WHERE SNP=?"%db_name,(snpname,))
 			if c.fetchone():
-				if len(values) == 7:
+				if len(unicode_values) == 7:
 					c.execute("UPDATE %s SET Reference = ?, Strain = ?, Position = ?, Derived_base = ?, Ancestral_base = ? WHERE SNP = ?"%db_name, 
-						(values[2].strip(), values[3].strip(), int(values[4].strip()),
-						values[5].strip(), values[6].strip(), snpname))
+						(unicode_values[2], unicode_values[3], int(unicode_values[4]),
+						unicode_values[5], unicode_values[6], snpname))
 			else:
-				if len(values) == 7:
-					queries.append((snpname, values[2].strip(), values[3].strip(),
-						int(values[4].strip()), values[5].strip(), values[6].strip()))
+				if len(unicode_values) == 7:
+					queries.append((snpname, unicode_values[2], unicode_values[3],
+						int(unicode_values[4]), unicode_values[5], unicode_values[6]))
 				else: #Skip line if one of the pieces of information is missing
 					print "#Skipping:", values
 	c.executemany("INSERT INTO %s VALUES(?,?,?,?,?,?)" % db_name, queries)
@@ -477,7 +480,7 @@ def import_tree(file_name):
 					c.execute("SELECT Name FROM Tree WHERE Name = ? AND Organism = ?", (nodes[i],organism_name))
 					if c.fetchone():
 						if len(nodes) > i+1: #Looking for children
-							c.execute("SELECT Children FROM Tree WHERE Name = ?", (nodes[i],))
+							c.execute("SELECT Children FROM Tree WHERE Name = ? and Organism = ?", (nodes[i],organism_name))
 							children = c.fetchone()[0]
 							if children:
 								child_list = children.split(";")
@@ -513,6 +516,10 @@ def tree_to_newick(organism):
 	'''
 	c.execute("SELECT * FROM Tree WHERE Organism = ?", (organism, ))
 	nodes = c.fetchall()
+	if config['dev']:
+		print "#[DEV] Nodes in Tree that have %s as Organism"%organism
+		for node in nodes:
+			print "#[DEV]",node
 	result = ''
 	count = 0 # Counter to stop if it doesnt work properly
 	while nodes and count < 10000: # Run the loop a maximum of 10000 times
