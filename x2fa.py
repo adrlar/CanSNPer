@@ -139,6 +139,7 @@ if __name__ == "__main__":
 	
 		if keep_going_flag: #If we have the reference
 			search_pos = 0
+			list_of_gaps = list()
 			sequence_search_string = str(aGen[alignment][reference_num]["seq"])
 			while search_pos < length_of_reference:
 				gap_hit = pattern_gap.search(sequence_search_string, search_pos)
@@ -146,19 +147,22 @@ if __name__ == "__main__":
 					rmH[alignment][gap_hit.start()] = gap_hit.end()-gap_hit.start() #Save information
 					search_pos = gap_hit.end()
 				else:
-					break	
+					break
+
 			for pos in reversed(sorted(rmH[alignment].keys())): #Go through those gaps and remove them
 				if rmH[alignment][pos]:
 					start = pos
 					end = pos + rmH[alignment][pos]
 					for sequence in aGen[alignment].keys():
-						if flank > 0:
-							new_start = max(0, start-flank)
-							new_end = min(len(aGen[alignment][sequence]["seq"]), end+flank)
-							aGen[alignment][sequence]["seq"][new_start:new_end] = bytearray("-"*(new_end-new_start))
-						aGen[alignment][sequence]["seq"] = aGen[alignment][sequence]["seq"][:start] + aGen[alignment][sequence]["seq"][end:]
-			if flank > 0:
-				list_of_gaps = list()
+						aGen[alignment][sequence]["seq"][start:end] = bytearray('')
+					if flank > 0: #If we are going to extend deletions, store the information for these
+						for i in range(0,len(list_of_gaps)):
+							#Reduce the position values as we remove pieces of the genome
+							list_of_gaps[i] = [list_of_gaps[i][0]-end+start, list_of_gaps[i][1]-end+start]
+						list_of_gaps.append([start, start])
+			
+			if flank > 0: #Extend the deletions by the number of bases given as flank
+				search_pos = 0
 				for sequence in aGen[alignment].keys():
 					if sequence == reference_num:
 						continue
@@ -175,6 +179,7 @@ if __name__ == "__main__":
 						new_start = max(0, non_ref_gap[0]-flank)
 						new_end = min(non_ref_gap[1]+flank, len(aGen[alignment][sequence]["seq"]))
 						aGen[alignment][sequence]["seq"][new_start:new_end] = bytearray("-"*(new_end - new_start))
+	
 	#Go through all the alignment blocks and add the sequence to the output bytearrays
 	for alignment in aGen.keys():
 		start = int(aGen[alignment][reference_num]["p1"])-1
