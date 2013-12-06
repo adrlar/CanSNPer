@@ -4,7 +4,7 @@
 CanSNPer: A toolkit for SNP-typing using NGS data.
 Copyright (C) 2013 Adrian Lärkeryd
 
-VERSION 1.02
+VERSION 1.03
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -115,7 +115,7 @@ def read_config(args):
 	'''
 	user = getpass.getuser()
 	
-	version = 1.02
+	version = 1.03
 	
 	config_list = {"tmp_path":"string","db_path":"string","mauve_path":"string",
 		"x2fa_path":"string","num_threads":"int","verbose":"boolean","allow_differences":"int",
@@ -383,10 +383,10 @@ def import_sequence(file_name):
 	strain_name = get_strain(organism_name)
 
 	#Checking for entries with this strain name
-	c.execute("SELECT DISTINCT Strain FROM Sequences")
+	c.execute("SELECT DISTINCT Organism, Strain FROM Sequences")
 	flag = True
 	for row in c.fetchall():
-		if strain_name == row[0]: #If an entry was found, set our flag to false
+		if strain_name == row[1] and organism_name == row[0]: #If an entry was found, set our flag to false
 			flag = False
 	if flag: #No entry for this strain name
 		c.execute("INSERT INTO Sequences VALUES(?,?,?)", (organism_name, strain_name, seq))

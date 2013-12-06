@@ -1,20 +1,28 @@
+2013-12-06  Adrian Lärkeryd  <adrian.larkeryd@foi.se>
+	
+	CanSNPer version 1.03
+	* (import_sequence)
+	Fixed a bug where if the same strain name was used in multiple organisms
+	loading the sequence to the second organism only updated the "old" one
+	because it only checked for strain name. Now checks organism as well.
+
 2013-10-17  Adrian Lärkeryd  <adrian.larkeryd@foi.se>
 	
 	CanSNPer version 1.02
 	* (import_to_db)
 	Changed the strings imported to the db with the --import_snp_file to be
-	unicode strings
+	unicode strings.
 	* (import_tree)
 	Fixed a bug where the same node name in several trees caused errors in
-	newick creation
+	newick creation.
 
 2013-10-14  Adrian Lärkeryd  <adrian.larkeryd@foi.se>
 	
 	CanSNPer version 1.01
 	* (parse_arguments)
-	Print help if no arguments were sent to CanSNPer
+	Print help if no arguments were sent to CanSNPer.
 	* (purge_organism)
-	Make sure the user wants to delete organism by asking
+	Make sure the user wants to delete organism by asking.
 
 2013-10-10  Adrian Lärkeryd <adrian.larkeryd@foi.se>
 	
