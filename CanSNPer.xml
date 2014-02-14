@@ -1,0 +1,23 @@
+<tool id="CanSNPer" name="CanSNPer genotyping">
+	<description>Galaxy interface for CanSNPer</description>
+	<command interpreter="python">CanSNPer -d --galaxy $verbosity -i $file -r $organism > $outfile1 2> $outfile2</command>
+	<inputs>
+		<param name="organism" type="text" size="30" label="Reference organism name"/>
+		<param format="fasta" name="file" type="data" label="Fasta file"/>
+		<param name="verbosity" type="select" label="Verbosity">
+			<option value="">Normal</option>
+			<option value="-v">Verbose</option>
+			<option value="-vq">Developer</option>
+		</param>
+	</inputs>
+	<outputs>
+		<data from_work_dir="CanSNPer_tree_galaxy.pdf" format="pdf" name="savetreefile" label="CanSNPer pdf tree"/>
+		<data format="tabular" name="outfile1" label="CanSNPer output file"/>
+		<data format="tabular" name="outfile2" label="CanSNPer error file"/>
+	</outputs>
+	<tests>
+	</tests>
+	<help>
+	This tool runs CanSNPer typing on uploaded fasta file.
+	</help>
+</tool>

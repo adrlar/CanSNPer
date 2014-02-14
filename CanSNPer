@@ -4,7 +4,7 @@
 CanSNPer: A toolkit for SNP-typing using NGS data.
 Copyright (C) 2013 Adrian Lärkeryd
 
-VERSION 1.03
+VERSION 1.04
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -91,6 +91,8 @@ def parse_arguments():
 	parser.add_argument("-initialise_organism", action="store_true",
 		help="initialise a new table for an organism")
 	parser.add_argument("-q", "--dev", action="store_true", help="dev mode")
+	parser.add_argument("--galaxy", action="store_true",
+		help="argument used if Galaxy is running CanSNPer, do NOT use.")	
 	
 	#Exit and print help if there were no arguments
 	if len(argv) == 1:
@@ -115,7 +117,7 @@ def read_config(args):
 	'''
 	user = getpass.getuser()
 	
-	version = 1.03
+	version = 1.04
 	
 	config_list = {"tmp_path":"string","db_path":"string","mauve_path":"string",
 		"x2fa_path":"string","num_threads":"int","verbose":"boolean","allow_differences":"int",
@@ -142,6 +144,7 @@ def read_config(args):
 	config["list_snps"] = False
 	config["reference"] = None
 	config["dev"] = False
+	config["galaxy"] = False
 
 	#Read config file
 	try:
@@ -207,7 +210,8 @@ def read_config(args):
 		config["delete_organism"] = True
 	if args.initialise_organism:
 		config["initialise_organism"] = True
-	
+	if args.galaxy:
+		config["galaxy"] = True
 
 	if config["dev"]: #Developer printout
 		print "#[DEV] configurations:%s"%config
@@ -343,7 +347,7 @@ def initialise_table():
 		c.execute("CREATE TABLE IF NOT EXISTS Sequences (Organism text, Strain text, Sequence text)")
 		c.execute("CREATE TABLE IF NOT EXISTS %s (SNP text, Reference text, Strain text, Position integer, Derived_base text, Ancestral_base text)" % organism_name)
 	except sqlite3.OperationalError as e:
-		print "OperationalError:",e
+		print "#[ERROR] OperationalError:",e
 
 
 def purge_organism():
@@ -559,7 +563,7 @@ def CanSNPer_tree_layout(node):
 	faces.add_face_to_node(name_face, node, column=0, position="branch-top")
 
 
-def draw_ete2_tree(organism, snplist, file_name):
+def draw_ete2_tree(organism, snplist, tree_file_name):
 	'''Draws a phylogenetic tree using ETE2
 
 	Keyword arguments:
@@ -599,8 +603,9 @@ def draw_ete2_tree(organism, snplist, file_name):
 	ts.show_scale = False # Do not show the scale
 	ts.layout_fn = CanSNPer_tree_layout # Use the custom layout
 	ts.optimal_scale_level = 'full'	# Fully expand the branches of the tree
-
-	tree.render("%s_tree.pdf"%file_name, tree_style=ts, w=tree_depth*500)
+	if config["dev"]:
+		print "#[DEV] Tree file: %s"%tree_file_name
+	tree.render(tree_file_name, tree_style=ts, w=tree_depth*500)
 
 
 def find_tree_root(db_name):
@@ -807,6 +812,10 @@ def align(file_name):
 		mauve_jobs = list()
 		jobs_left = min(jobs_done+max_threads+1, seq_counter+1)
 		for i in range(jobs_done+1, jobs_left):
+			if config["dev"]:
+				print "#[DEV] progressiveMauve command:%s --output=%s.%s.xmfa "%(config["mauve_path"], output, seq_uids[i])+\
+					"%s/CanSNPer_reference_sequence.%s.fa %s > "%(config["tmp_path"], seq_uids[i], file_name)+\
+					"/dev/null 2> %s/CanSNPer_err%s.txt"%(config["tmp_path"], seq_uids[i])
 			mauve_jobs.append(multiprocessing.Process(target=run_command,
 				args=("%s --output=%s.%s.xmfa "%(config["mauve_path"], output, seq_uids[i])+\
 					"%s/CanSNPer_reference_sequence.%s.fa %s > "%(config["tmp_path"], seq_uids[i], file_name)+\
@@ -884,10 +893,15 @@ def align(file_name):
 	
 	if config["draw_tree"]: #Draw a tree and mark positions
 		snplist = snp_lister(alternates, db_name, out_name)
-		draw_ete2_tree(db_name, snplist[1:], file_name)
+		if config["galaxy"]:
+			tree_file_name = getcwd() + "/CanSNPer_tree_galaxy.pdf"
+		else:
+			tree_file_name = "%s_tree.pdf"%file_name
+		draw_ete2_tree(db_name, snplist[1:], tree_file_name)
 
 	#Tree walker!
 	tree_location = multi_tree_walker(root, alternates, db_name, config["allow_differences"], list(), force_flag)
+	
 	#Print the results of our walk
 	if config["tab_sep"]:
 		print "%s\t%s"%(out_name, tree_location[0])

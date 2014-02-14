@@ -1,4 +1,18 @@
 2013-12-06  Adrian Lärkeryd  <adrian.larkeryd@foi.se>
+	CanSNPer version 1.04
+	* GALAXY TOOL, added CanSNPer.xml
+	* (parse_arguments, read_config)
+	Added a --galaxy argument that will cause behaviour apropriate for when
+	running the Galaxy tool that was just created.
+	* (draw_ete2_tree)
+	Changed file_name to tree_file_name for clarity and added a DEV printout
+	* (align)
+	Added a DEV printout for progressiveMauve commands
+	Added a check for the --galaxy argument that determines where to put the
+	tree pdf file. In case of galaxy it is put in the working directory,
+	otherwise works like before (ie in the query file directory)
+
+2013-12-06  Adrian Lärkeryd  <adrian.larkeryd@foi.se>
 	
 	CanSNPer version 1.03
 	* (import_sequence)
