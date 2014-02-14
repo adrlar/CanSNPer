@@ -1,4 +1,12 @@
 ###################
+#Installing CanSNPer
+###################
+CanSNPer is written in Python and requires Python installed as well as several 
+dependencies listed in the INSTALL document. Consult that file for detailed 
+installation instructions. When the dependencies are all installed CanSNPer can 
+be run as it is from the shell.
+
+###################
 #Running CanSNPer
 ###################
 All CanSNPer runs start with the main CanSNPer script. Assuming it is in your 
