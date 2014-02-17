@@ -1,4 +1,4 @@
-2013-12-06  Adrian Lärkeryd  <adrian.larkeryd@foi.se>
+2014-02-14  Adrian Lärkeryd  <adrian.larkeryd@foi.se>
 	CanSNPer version 1.04
 	* GALAXY TOOL, added CanSNPer.xml
 	* (parse_arguments, read_config)
