@@ -190,3 +190,25 @@ apart.
 The column Organism name is not used by CanSNPer at this moment, but is kept in 
 order to ease any future work with the file formats and import functions. It 
 can be left out, but there must then be two tabs between SNP name and Reference.
+
+###################
+#Running CanSNPer in Galaxy
+###################
+There is a Galaxy tool definition file available with the Github CanSNPer 
+distribution called CanSNPer.xml. Place this file along with the CanSNPer main 
+script and the CanSNPer.conf in the Galaxy tools folder and make sure to edit 
+the Galaxy tool_conf.xml tool-registry file. More detailed instructions on how 
+to add a tool to Galaxy can be found at wiki.galaxyproject.org.
+
+There is one more thing that may need additional configuration when running 
+CanSNPer in Galaxy; the tmp-folder set by Galaxy. The default may cause issues 
+running progressiveMauve and will in that case show up as an error in the 
+CanSNPer error file produced by Galaxy. Set the tmp-file path in the 
+universe_wsgi.ini config file located in your Galaxy root. Just make sure you 
+have the apropriate permissions to work in the set directory.
+
+CanSNPer has a specific command-line option that is specific for a Galaxy run. 
+It is --galaxy and should not be invoked unless CanSNPer is running from Galaxy.
+
+The CanSNPer galaxy tool is largely untested and feedback is greatly 
+appreciated.

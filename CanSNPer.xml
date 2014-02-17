@@ -15,8 +15,10 @@
 		<data format="tabular" name="outfile1" label="CanSNPer output file"/>
 		<data format="tabular" name="outfile2" label="CanSNPer error file"/>
 	</outputs>
-	<tests>
-	</tests>
+	<requirements>
+		<requirement type="python-module">ete2</requirement>
+		<requirement type="binary">progressiveMauve</requirement>
+	</requirements>
 	<help>
 	This tool runs CanSNPer typing on uploaded fasta file.
 	</help>
