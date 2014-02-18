@@ -122,7 +122,7 @@ def read_config(args):
 	config_list = {"tmp_path":"string","db_path":"string","mauve_path":"string",
 		"x2fa_path":"string","num_threads":"int","verbose":"boolean","allow_differences":"int",
 		"save_align":"boolean","draw_tree":"boolean","list_snps":"boolean","reference":"string",
-		"tab_sep":"boolean", "dev":"boolean"}
+		"tab_sep":"boolean", "dev":"boolean", "galaxy":"boolean"}
 
 	config = dict()
 	if args.config_file:
@@ -217,6 +217,8 @@ def read_config(args):
 		print "#[DEV] configurations:%s"%config
 	if config["verbose"]:
 		print "#Version: %0.2f"%version
+		if config["galaxy"]:
+			print "#Running through Galaxy"
 	return config
 
 
@@ -347,7 +349,7 @@ def initialise_table():
 		c.execute("CREATE TABLE IF NOT EXISTS Sequences (Organism text, Strain text, Sequence text)")
 		c.execute("CREATE TABLE IF NOT EXISTS %s (SNP text, Reference text, Strain text, Position integer, Derived_base text, Ancestral_base text)" % organism_name)
 	except sqlite3.OperationalError as e:
-		print "#[ERROR] OperationalError:",e
+		exit("#[ERROR] SQLite OperationalError: %s"%str(e))
 
 
 def purge_organism():
@@ -380,7 +382,7 @@ def import_sequence(file_name):
 	sequence_validation_regex = re.compile("[ATCGN]+")
 	validation_search = sequence_validation_regex.search(seq)
 	if validation_search.start() != 0 or validation_search.end() != len(seq):
-		message = "Error: You have a non-ATCGN character in your sequence file at position %d"%(validation_search.end()+1)
+		message = "#[Error] You have a non-ATCGN character in your sequence file at position %d"%(validation_search.end()+1)
 		exit(message)
 	
 	organism_name = get_organism()
@@ -637,7 +639,7 @@ def find_tree_root(db_name):
 	if config["dev"]: #Developer printout
 		print "#[DEV] root %s tree: %s"%(db_name, root)
 	if not root:
-		exit("Error: Could not find root of %s tree"%db_name)
+		exit("#[Error] Could not find root of %s tree"%db_name)
 	return root
 
 
@@ -657,7 +659,7 @@ def snp_lister(sequences, organism, out_name):
 		try: #Catch a KeyError that arises when a sequence is missing from the DB
 			results.append([snp[4],snp[2],snp[3],sequences[snp[0]][snp[1]-1]])
 		except KeyError, e:
-			message = "Error: SNP position of "+snp[4]+" listed in strain that is not in the database: " + str(e.message)
+			message = "#[Error] SNP position of "+snp[4]+" listed in strain that is not in the database: " + str(e.message)
 			exit(message)
 	return results
 
@@ -715,7 +717,7 @@ def multi_tree_walker(node, sequences, organism, threshold, wrong_list, cont_fla
 						return multi_tree_walker(child, sequences, organism, threshold, wrong_list, True, quiet) #Move further down the Tree
 				return node, wrong_list #Return node if we didnt find anything by forcing
 		except KeyError, e:
-			message = "Error: SNP position of "+node+" listed in strain that is not in the database: " + str(e.message)
+			message = "#[Error] SNP position of "+node+" listed in strain that is not in the database: " + str(e.message)
 			exit(message)
 	else:
 		stderr.write("#[WARNING] SNP not in database: %s\n"%node)
@@ -735,7 +737,7 @@ def x2fa_error_check(num):
 	x2fa_errors_file.close()
 
 	if x2fa_errors: #Quit if there was something wrong
-		exit("Error in x2fa.py:\n"+x2fa_errors)
+		exit("#[Error] x2fa.py failed to complete:\n"+x2fa_errors)
 	
 	#Remove the file if there were no errors, annoying to have an empty file lying around
 	silent_remove("%s/CanSNPer_xerr%s.txt"%(config["tmp_path"],num))
@@ -754,7 +756,7 @@ def mauve_error_check(num):
 	mauve_errors_file.close()	
 
 	if mauve_errors: #Quit if there was something wrong
-		exit("Error in progressiveMauve:\n"+mauve_errors)
+		exit("#[Error] progressiveMauve filed to complete:\n"+mauve_errors)
 	
 	#Remove the file if there were no errors, annoying to have an empty file lying around
 	silent_remove("%s/CanSNPer_err%s.txt"%(config["tmp_path"],num))
@@ -800,7 +802,7 @@ def align(file_name):
 	
 	#Check if the file exists
 	if not path.isfile(file_name):
-		exit("No such file: %s"%file_name)
+		exit("#[Error] No such file: %s"%file_name)
 	
 	#Parallelised running of several progressiveMauve processes
 	if config["num_threads"] == 0 or config["num_threads"] > seq_counter:
