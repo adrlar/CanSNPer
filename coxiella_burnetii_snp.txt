@@ -1,13 +1,13 @@
 #The Root SNP was derived from an alignment with R. grylli in order to root the C. burnetii tree
 #SNP	Organism	Reference	Strain	Position	Derived_base	Ancestral_base
 Root	Coxiella_burnetii	NA	AE016828.2	516	T	G
-C.1	Coxiella_burnetii	Myrtennäs	AE016828.2	1811671	G	C
-C.3	Coxiella_burnetii	Myrtennäs	AE016828.2	559844	C	T
-C.4	Coxiella_burnetii	Myrtennäs	AE016828.2	604402	A	G
-C.5	Coxiella_burnetii	Myrtennäs	AE016828.2	847839	C	T
-C.6	Coxiella_burnetii	Myrtennäs	AE016828.2	648943	A	G
-C.7	Coxiella_burnetii	Myrtennäs	AE016828.2	1177930	A	G
-C.8	Coxiella_burnetii	Myrtennäs	AE016828.2	1356018	T	C
-C.9	Coxiella_burnetii	Myrtennäs	AE016828.2	33004	A	G
-C.10	Coxiella_burnetii	Myrtennäs	AE016828.2	1436254	T	C
-C.11	Coxiella_burnetii	Myrtennäs	AE016828.2	1792411	A	G
+C.1	Coxiella_burnetii	Karlsson2014	AE016828.2	1811671	G	C
+C.3	Coxiella_burnetii	Karlsson2014	AE016828.2	559844	C	T
+C.4	Coxiella_burnetii	Karlsson2014	AE016828.2	604402	A	G
+C.5	Coxiella_burnetii	Karlsson2014	AE016828.2	847839	C	T
+C.6	Coxiella_burnetii	Karlsson2014	AE016828.2	648943	A	G
+C.7	Coxiella_burnetii	Karlsson2014	AE016828.2	1177930	A	G
+C.8	Coxiella_burnetii	Karlsson2014	AE016828.2	1356018	T	C
+C.9	Coxiella_burnetii	Karlsson2014	AE016828.2	33004	A	G
+C.10	Coxiella_burnetii	Karlsson2014	AE016828.2	1436254	T	C
+C.11	Coxiella_burnetii	Karlsson2014	AE016828.2	1792411	A	G
