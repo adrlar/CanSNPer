@@ -41,7 +41,7 @@ if __name__ == "__main__":
 	'''Run the program'''
 	if len(sys.argv) != 5:
 		#Usage information
-		exit("usage: x2fas_v6.py <.xmfa> <reference> <screen deletions by X bases> <outfile>")
+		exit("usage: x2fa.py <.xmfa> <reference> <screen deletions by X bases> <outfile>")
 
 	#Self-explanatory grabbing of command-line arguments
 	xmfa = open(sys.argv[1], "r")
