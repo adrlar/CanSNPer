@@ -141,7 +141,7 @@ if __name__ == "__main__":
 			search_pos = 0
 			list_of_gaps = list()
 			sequence_search_string = str(aGen[alignment][reference_num]["seq"])
-			while search_pos < length_of_reference:
+			while search_pos < len(aGen[alignment][reference_num]["seq"]):
 				gap_hit = pattern_gap.search(sequence_search_string, search_pos)
 				if gap_hit: #Looking for gaps in the reference
 					rmH[alignment][gap_hit.start()] = gap_hit.end()-gap_hit.start() #Save information
