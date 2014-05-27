@@ -212,3 +212,12 @@ It is --galaxy and should not be invoked unless CanSNPer is running from Galaxy.
 
 The CanSNPer galaxy tool is largely untested and feedback is greatly 
 appreciated.
+
+
+###################
+#Citing CanSNPer 
+###################
+The first verion of CanSNPer is published in [Bioinformatics](http://bioinformatics.oxfordjournals.org/content/early/2014/03/21/bioinformatics.btu113.abstract). 
+
+Lärkeryd A, Myrtennäs K, Karlsson E, Dwibedi CK, Forsman M, Larsson P, Johansson A, Sjödin A: 
+CanSNPer: a hierarchical genotype classifier of clonal pathogens. Bioinformatics 2014:1–3.
