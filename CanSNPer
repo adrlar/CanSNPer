@@ -4,7 +4,7 @@
 CanSNPer: A toolkit for SNP-typing using NGS data.
 Copyright (C) 2013 Adrian Lärkeryd
 
-VERSION 1.04
+VERSION 1.05
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -26,13 +26,13 @@ from uuid import uuid4
 import errno
 import inspect
 import getpass
+import time
 
 import argparse
 import re
 import sqlite3
 
-import multiprocessing
-import subprocess
+from subprocess import Popen
 
 from ete2 import Tree, faces, AttrFace, TreeStyle, NodeStyle
 
@@ -44,7 +44,7 @@ def parse_arguments():
 	
 	cansnper_description = '''
 	CanSNPer: A toolkit for SNP-typing using NGS data.
-	Copyright (C) 2013 Adrian Lärkeryd.
+	Copyright (C) 2015 Adrian Lärkeryd.
 
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -117,7 +117,7 @@ def read_config(args):
 	'''
 	user = getpass.getuser()
 	
-	version = 1.04
+	version = 1.05
 	
 	config_list = {"tmp_path":"string","db_path":"string","mauve_path":"string",
 		"x2fa_path":"string","num_threads":"int","verbose":"boolean","allow_differences":"int",
@@ -167,7 +167,7 @@ def read_config(args):
 					config[argument_name] = argument_value
 		config_file_open.close()
 	except IOError as e:
-		stderr.write("#[WARNING] No config file found: %s\n"%str(e))
+		stderr.write("#[WARNING in %s] No config file found: %s\n"%(config["query"], str(e)))
 
 	#Not in config file
 	config["query"] = None
@@ -180,6 +180,7 @@ def read_config(args):
 
 	if args.dev:
 		config["dev"] = True
+		config["verbose"] = True #Want verbose output if we are running dev
 	if args.reference:
 		config["reference"] = args.reference
 	if args.query:
@@ -303,16 +304,6 @@ def select_strain(db_name):
 	return strain_name
 
 
-def run_command(cmd):
-	'''Starts a subprocess running the command supplied.
-	
-	Keyword arguments:
-	cmd -- the command that is to be executed in the shell
-	
-	'''
-	subprocess.call(cmd, shell=True)
-
-
 def silent_remove(file_name):
 	'''Removes a file, without throwing no-such-file-or-directory-error.
 	
@@ -349,7 +340,7 @@ def initialise_table():
 		c.execute("CREATE TABLE IF NOT EXISTS Sequences (Organism text, Strain text, Sequence text)")
 		c.execute("CREATE TABLE IF NOT EXISTS %s (SNP text, Reference text, Strain text, Position integer, Derived_base text, Ancestral_base text)" % organism_name)
 	except sqlite3.OperationalError as e:
-		exit("#[ERROR] SQLite OperationalError: %s"%str(e))
+		exit("#[ERROR in %s] SQLite OperationalError: %s"%(config["query"], str(e)))
 
 
 def purge_organism():
@@ -382,7 +373,7 @@ def import_sequence(file_name):
 	sequence_validation_regex = re.compile("[ATCGN]+")
 	validation_search = sequence_validation_regex.search(seq)
 	if validation_search.start() != 0 or validation_search.end() != len(seq):
-		message = "#[Error] You have a non-ATCGN character in your sequence file at position %d"%(validation_search.end()+1)
+		message = "#[ERROR in %s] You have a non-ATCGN character in your sequence file at position %d"%(config["query"], validation_search.end()+1)
 		exit(message)
 	
 	organism_name = get_organism()
@@ -549,7 +540,7 @@ def tree_to_newick(organism):
 					nodes.remove(node)
 		count += 1
 	if count > 9999: #Could not insert all nodes into the tree
-		stderr.write("#[WARNING] Broken tree, cannot convert entire tree to newick format. "+\
+		stderr.write("#[WARNING in %s] Broken tree, cannot convert entire tree to newick format. "%config["query"]+\
 			"Most likely reason is a non-root node not listed as a child anywhere in the tree\n")
 		if config["dev"]:
 			print "#[DEV] These nodes were left out of the tree: %s"%str(nodes)
@@ -639,7 +630,7 @@ def find_tree_root(db_name):
 	if config["dev"]: #Developer printout
 		print "#[DEV] root %s tree: %s"%(db_name, root)
 	if not root:
-		exit("#[Error] Could not find root of %s tree"%db_name)
+		exit("#[ERROR in %s] Could not find root of %s tree"%(config["query"],db_name))
 	return root
 
 
@@ -659,12 +650,12 @@ def snp_lister(sequences, organism, out_name):
 		try: #Catch a KeyError that arises when a sequence is missing from the DB
 			results.append([snp[4],snp[2],snp[3],sequences[snp[0]][snp[1]-1]])
 		except KeyError, e:
-			message = "#[Error] SNP position of "+snp[4]+" listed in strain that is not in the database: " + str(e.message)
+			message = "#[ERROR in %s] SNP position of %s listed in strain that is not in the database: %s"%(config["query"], snp[4], str(e.message))
 			exit(message)
 	return results
 
 
-def multi_tree_walker(node, sequences, organism, threshold, wrong_list, cont_flag=False, quiet=False):
+def multi_tree_walker(node, sequences, organism, threshold, wrong_list, force_flag=False, quiet=False):
 	'''Tree walking classifier for CanSNPer.
 
 	Keyword arguments:
@@ -673,7 +664,7 @@ def multi_tree_walker(node, sequences, organism, threshold, wrong_list, cont_fla
 	organism -- The name of the organism
 	threshold -- Number of ancestral SNPs to allow in the classification
 	wrong_list -- A list of the positions that have been wrong, ie ancestral SNP
-	cont_flag -- Boolean, flag for whether or not to force through current node
+	force_flag -- Boolean, flag for whether or not to force through current node
 				 even if the sequence does not have the derived SNP
 	quiet -- Boolean, if the function is run in a quiet mode, i.e. as a test
 			 this mode is run by the algorithm itself when "looking" deeper into the tree
@@ -682,45 +673,87 @@ def multi_tree_walker(node, sequences, organism, threshold, wrong_list, cont_fla
 	test of the next node has been completed.
 
 	'''
+	qstring = ""
+	fstring = ""
+	if quiet:
+		qstring = "quiet"
+	else:
+		qstring = "not quiet"
+	if force_flag:
+		fstring = "Forcing"
+	else:
+		fstring = "Walking"
+	if config["dev"]:
+		print "#[DEV]", fstring, "into", node, qstring
+	
 	c.execute("SELECT Strain, Position, Derived_base FROM %s WHERE SNP = ?"%organism, (node,))
 	snp_info = c.fetchone()
 	if snp_info:
 		try: #Catch a KeyError that arises when a sequence is missing from the DB
-			if sequences[snp_info[0]][snp_info[1]-1] == snp_info[2] or cont_flag:
-				if quiet and cont_flag == False: 
+			if sequences[snp_info[0]][snp_info[1]-1] == snp_info[2] or force_flag:
+				if sequences[snp_info[0]][snp_info[1]-1] != snp_info[2]:#If its wrong and we are forcing
+					if node not in wrong_list:
+						wrong_list.append(node)
+				if quiet and not force_flag:
 					#Return True if we are quietly testing a single node and we are not forcing it
 					return True, True
 				c.execute("SELECT Children FROM Tree WHERE Name = ? AND Organism = ?", (node, organism))
 				children = c.fetchone()[0]
+				
 				if not children: #No children, Leaf node.
-					if len(wrong_list) >= threshold and sequences[snp_info[0]][snp_info[1]-1] != snp_info[2]:
+					if sequences[snp_info[0]][snp_info[1]-1] != snp_info[2]:#Hit a leaf that is not derived
+						if config["dev"] and not quiet:
+							print "#[DEV] %s was not derived"%node
+						wrong_list.remove(node)
 						return None, wrong_list
-					elif sequences[snp_info[0]][snp_info[1]-1] != snp_info[2]:
-						if not quiet:
-							wrong_list.append(node)
+					else:#Hit a leaf that is derived
+						if config["dev"] and not quiet:
+							print "#[DEV] %s was a derived leaf. We are done here."%node
 						return node, wrong_list
-					else:
-						return node, wrong_list
+
 				for child in children.split(";"): #Has children, loop through them
-					if config["dev"]: #Developer printout
+					if config["dev"] and not quiet: #Developer printout
 						print "#[DEV] testing child: %s"%child
-					if multi_tree_walker(child, sequences, organism, threshold, wrong_list, False, True)[0]: #Has the SNP of child
-						return multi_tree_walker(child, sequences, organism, threshold, wrong_list, False, quiet) #Move further down the Tree
+					#Test the SNP of child
+					if multi_tree_walker(child, sequences, organism, threshold, wrong_list, False, True)[0]:
+						#Move further down the Tree if it worked
+						if config["dev"] and not quiet:
+							print "#[DEV] testing child success, going into: %s"%child
+						return multi_tree_walker(child, sequences, organism, threshold, wrong_list, False, quiet)
+				if config["dev"] and not quiet:
+					print "#[DEV] Number of forced SNPs: %s, Threshold: %s, %s"%(len(wrong_list), threshold, str(wrong_list))
 				if len(wrong_list) >= threshold:
-					return node, wrong_list #Return node if we passed the threshold
+					if not quiet and sequences[snp_info[0]][snp_info[1]-1] == snp_info[2]:
+						return node, wrong_list #Return node if we passed the threshold
+					else:
+						wrong_list.remove(node)
+						return None, wrong_list
+				
+				if config["dev"] and not quiet: #Developer printout
+					print "#[DEV] Now going to try to force %s"%children
 				for child in children.split(";"): #loop again if there were no results without force
-					if config["dev"]: #Developer printout
-						print "#[DEV] force-testing child: %s"%child
-					if multi_tree_walker(child, sequences, organism, threshold, wrong_list, True, True)[0]: #Force the SNP of child child
-						if not quiet:	
-							wrong_list.append(child)
-						return multi_tree_walker(child, sequences, organism, threshold, wrong_list, True, quiet) #Move further down the Tree
-				return node, wrong_list #Return node if we didnt find anything by forcing
+					if config["dev"] and not quiet:
+							print "#[DEV] force-testing child: %s"%child
+					#Test forcing the SNP of child
+					if multi_tree_walker(child, sequences, organism, threshold, wrong_list, True, True)[0]:
+						#Move further down the Tree if it worked
+						return multi_tree_walker(child, sequences, organism, threshold, wrong_list, True, quiet)
+				
+				if sequences[snp_info[0]][snp_info[1]-1] == snp_info[2]:
+					return node, wrong_list #Return node if we didnt find anything by forcing
+				else:
+					wrong_list.remove(node) #Return None if we failed while "looking" quietly
+					return None, wrong_list
 		except KeyError, e:
-			message = "#[Error] SNP position of "+node+" listed in strain that is not in the database: " + str(e.message)
+			message = "#[ERROR in %s] SNP position of %s listed in strain that is not in the database: %s"%(config["query"],node,str(e.message))
 			exit(message)
 	else:
-		stderr.write("#[WARNING] SNP not in database: %s\n"%node)
+		stderr.write("#[WARNING in %s] SNP not in database: %s\n"%(config["query"], node))
+	if config["dev"]: #Developer printout
+		print "#[DEV] %s was not derived"%node
+	#if not quiet and force_flag:
+	if node in wrong_list:
+		wrong_list.remove(node)
 	return None, wrong_list
 
 
@@ -737,7 +770,7 @@ def x2fa_error_check(num):
 	x2fa_errors_file.close()
 
 	if x2fa_errors: #Quit if there was something wrong
-		exit("#[Error] x2fa.py failed to complete:\n"+x2fa_errors)
+		exit("#[ERROR in %s] x2fa.py failed to complete:\n%s"%(config["query"],x2fa_errors))
 	
 	#Remove the file if there were no errors, annoying to have an empty file lying around
 	silent_remove("%s/CanSNPer_xerr%s.txt"%(config["tmp_path"],num))
@@ -756,7 +789,7 @@ def mauve_error_check(num):
 	mauve_errors_file.close()	
 
 	if mauve_errors: #Quit if there was something wrong
-		exit("#[Error] progressiveMauve filed to complete:\n"+mauve_errors)
+		exit("#[ERROR in %s] progressiveMauve filed to complete:\n%s"%(config["query"],mauve_errors))
 	
 	#Remove the file if there were no errors, annoying to have an empty file lying around
 	silent_remove("%s/CanSNPer_err%s.txt"%(config["tmp_path"],num))
@@ -772,7 +805,6 @@ def align(file_name):
 
 	'''
 	#Set warning flags
-	ALIGNMENT_WARNING = False
 	WARNINGS = dict()
 
 	#Get database and output name
@@ -789,7 +821,7 @@ def align(file_name):
 	reference_sequences = dict()
 	
 	if config["verbose"]:
-		print "#Fetching sequences ..."
+		print "#Fetching reference sequence(s) ..."
 	for row in c.fetchall():
 		seq_counter+=1
 		seq_uids[seq_counter] = uuid4().hex #32 char long unique hex string used for unique tmp file names
@@ -802,58 +834,63 @@ def align(file_name):
 	
 	#Check if the file exists
 	if not path.isfile(file_name):
-		exit("#[Error] No such file: %s"%file_name)
+		exit("#[ERROR in %s] No such file: %s"%(config["query"],file_name))
 	
 	#Parallelised running of several progressiveMauve processes
 	if config["num_threads"] == 0 or config["num_threads"] > seq_counter:
 		max_threads = seq_counter
 	else:
 		max_threads = config["num_threads"]
-	jobs_done = 0
-	while jobs_done < seq_counter:
-		mauve_jobs = list()
-		jobs_left = min(jobs_done+max_threads+1, seq_counter+1)
-		for i in range(jobs_done+1, jobs_left):
-			if config["dev"]:
-				print "#[DEV] progressiveMauve command:%s --output=%s.%s.xmfa "%(config["mauve_path"], output, seq_uids[i])+\
-					"%s/CanSNPer_reference_sequence.%s.fa %s > "%(config["tmp_path"], seq_uids[i], file_name)+\
-					"/dev/null 2> %s/CanSNPer_err%s.txt"%(config["tmp_path"], seq_uids[i])
-			mauve_jobs.append(multiprocessing.Process(target=run_command,
-				args=("%s --output=%s.%s.xmfa "%(config["mauve_path"], output, seq_uids[i])+\
-					"%s/CanSNPer_reference_sequence.%s.fa %s > "%(config["tmp_path"], seq_uids[i], file_name)+\
-					"/dev/null 2> %s/CanSNPer_err%s.txt"%(config["tmp_path"], seq_uids[i]),)))
-				
-		for i in range(0, len(mauve_jobs)): #Start the jobs
-			mauve_jobs[i].start()
-			if config["verbose"]:
-				print "#[P%d] Aligning %s against %s ..."%(i, out_name, reference_sequences[i+jobs_done+1])
-		for i in range(0, len(mauve_jobs)): #Wait for all to finish
-			mauve_jobs[i].join()
-			mauve_error_check(seq_uids[i+1+jobs_done]) #Run an error check, looking for something in the CanSNPer_err.txt file
 	
-		#Parallelised running of the x2fa.py script
-		x2f_jobs = list()
-		for i in range(jobs_done+1, jobs_left):
-			if config["save_align"]:
-				fasta_name = reference_sequences[i]
-			else:
-				fasta_name = seq_uids[i]
-			command = "%s %s.%s.xmfa %s/CanSNPer_reference_sequence.%s.fa "%(config["x2fa_path"],
-				output, seq_uids[i], config["tmp_path"], seq_uids[i]) +\
-				"0 %s.%s.fa 2> %s/CanSNPer_xerr%s.txt"%(output, fasta_name, config["tmp_path"], seq_uids[i])
+	if config["verbose"]:
+		print "#Aligning sequence against %i reference sequence(s) ..."%len(reference_sequences)
+	
+	processes = list()
+	mauve_jobs = list()
+	x2f_jobs = list()
+	for i in range(1,seq_counter+1):
+		if config["save_align"]:
+			fasta_name = reference_sequences[i]
+		else:
+			fasta_name = seq_uids[i]
+		#Write the commands that will be run. one for each reference sequence
+		mauve_jobs.append("%s --output=%s.%s.xmfa "%(config["mauve_path"], output, seq_uids[i])+\
+			"%s/CanSNPer_reference_sequence.%s.fa %s > "%(config["tmp_path"], seq_uids[i], file_name)+\
+			"/dev/null 2> %s/CanSNPer_err%s.txt"%(config["tmp_path"], seq_uids[i]))
+		x2f_jobs.append("%s %s.%s.xmfa %s/CanSNPer_reference_sequence.%s.fa "%(config["x2fa_path"],
+			output, seq_uids[i], config["tmp_path"], seq_uids[i]) +\
+			"0 %s.%s.fa 2> %s/CanSNPer_xerr%s.txt"%(output, fasta_name, config["tmp_path"], seq_uids[i]))
+	
+	#Starting the processes that use progressiveMauve to align sequences
+	while True:
+		while mauve_jobs and len(processes) < max_threads:
+			job = mauve_jobs.pop()
+			processes.append(Popen(job, shell=True))
 			if config["dev"]:
-				print "#[DEV] x2fa command:%s"%command
-			x2f_jobs.append(multiprocessing.Process(target=run_command,
-				args=(command,)))
-		for i in range(0, len(x2f_jobs)): #Start the jobs
-			x2f_jobs[i].start()
-			if config["verbose"]:
-				print "#[P%d] Converting alignment against %s to fasta ..."%(i, reference_sequences[i+jobs_done+1])
-		for i in range(0, len(x2f_jobs)): #Wait for all to finish
-			x2f_jobs[i].join()
-			x2fa_error_check(seq_uids[i+1+jobs_done]) #Run an error check, looking for something in the CanSNPer_xerr.txt file
-		jobs_done+=len(mauve_jobs)
-
+				print "#[DEV] progressiveMauve command: %s"%job
+		for p in processes:
+			if p.poll() is not None:
+				processes.remove(p)
+		if not processes and not mauve_jobs:
+			break
+		time.sleep(0.5)
+	for uid in seq_uids:#Errorcheck mauve, cant continue if it crashed
+		mauve_error_check(seq_uids[uid])
+	while True:
+		while x2f_jobs and len(processes) < max_threads:
+			job = x2f_jobs.pop()
+			processes.append(Popen(job, shell=True))
+			if config["dev"]:
+				print "#[DEV] x2fa.py command: %s"%job
+		for p in processes:
+			if p.poll() is not None:
+				processes.remove(p)
+		if not processes and not x2f_jobs:
+			break
+		time.sleep(0.5)
+	for uid in seq_uids:#Errorcheck x2fa.py
+		x2fa_error_check(seq_uids[uid])
+	
 	#Now we have aligned sequences, read them into memory and
 	#start working through the tree
 	alternates = dict()
@@ -873,8 +910,7 @@ def align(file_name):
 			if reference[j] == alternate[j]:
 				identity_counter += 1
 		if float(identity_counter)/float(len(reference)) < 0.8:
-			ALIGNMENT_WARNING = True
-			WARNINGS["ALIGNMENT_WARNING"] = "#[WARNING] Sequence identity between %s and a reference strain of"%out_name +\
+			WARNINGS["ALIGNMENT_WARNING"] = "#[WARNING in %s] Sequence identity between %s and a reference strain of"%(config["query"],out_name) +\
 				" %s was only %.2f percent"%(db_name, float(identity_counter)/float(len(reference))*100)
 
 	root = find_tree_root(db_name) #Find the root of the tree we are using
@@ -914,13 +950,19 @@ def align(file_name):
 		incorrect_snps = ""
 		for incorrect_snp in tree_location[1]:
 			incorrect_snps += str(incorrect_snp) + " "
-		print "#[WARNING] these SNPs were not in the derived state:", incorrect_snps
+		WARNINGS["TREE_WARNING"] = "#[WARNING in %s] these SNPs were not in the derived state: %s"%(config["query"], str(incorrect_snps))
 		if config["verbose"]:
 			print "#A forced tree walk was conducted"
 	
-	if ALIGNMENT_WARNING: #Print any warnings that may have been collected
+	try: #Print any warnings that may have been collected
 		stderr.write(str(WARNINGS["ALIGNMENT_WARNING"])+"\n")
-	
+	except KeyError:
+		pass
+	try:
+		stderr.write(str(WARNINGS["TREE_WARNING"])+"\n")
+	except KeyError:
+		pass
+
 	#Remove a bunch of tmp files
 	while seq_counter:
 		if config["save_align"]:
@@ -948,7 +990,7 @@ if __name__ == '__main__':
 		cnx = sqlite3.connect(config["db_path"])
 		c = cnx.cursor()
 	except sqlite3.OperationalError as e:
-		exit("#[ERROR] Could not open database at %s:\n%s"%(config["db_path"], str(e)))
+		exit("#[ERROR in %s] Could not open database at %s:\n%s"%(config["query"], config["db_path"], str(e)))
 
 	#Run the apropriate functions
 	if config["initialise_organism"]:

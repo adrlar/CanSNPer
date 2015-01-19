@@ -1,3 +1,26 @@
+2015-01-19  Adrian Lärkeryd  <adrian.larkeryd@foi.se>
+	CanSNPer version 1.05
+	* (multi_tree_walker)
+	Many developer printouts were added to debug the walking algorithm.
+	* (multi_tree_walker)
+	Changed the name of cont_flag to force_flag to better describe what it
+	stands for
+	* (multi_tree_walker)
+	Changed how forcing a node works. Now handles leaves when forcing and
+	fixed a bug that caused sequences to be classified as non-derived nodes,
+	even though CanSNPer at the same time warned that this node was not
+	derived.
+	* (align)
+	Changed multiprocessing operations to subprocess Popens. This was done to
+	get rid of some waiting time where the previous implementation had to wait
+	for all processes in a batch to end before starting the next batch. Now
+	new processes start immediately when one is done, keeping the number at
+	batch size.
+	* (align)
+	Removed verbose output that said which references were being aligned. This
+	must now be seen in the dev printout that lists Mauve commands if the
+	information is needed.
+
 2014-02-14  Adrian Lärkeryd  <adrian.larkeryd@foi.se>
 	CanSNPer version 1.04
 	* GALAXY TOOL, added CanSNPer.xml
