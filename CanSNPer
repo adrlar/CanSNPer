@@ -748,7 +748,8 @@ def multi_tree_walker(node, sequences, organism, threshold, wrong_list, force_fl
 			message = "#[ERROR in %s] SNP position of %s listed in strain that is not in the database: %s"%(config["query"],node,str(e.message))
 			exit(message)
 	else:
-		stderr.write("#[WARNING in %s] SNP not in database: %s\n"%(config["query"], node))
+		if not quiet:
+			stderr.write("#[WARNING in %s] SNP not in database: %s\n"%(config["query"], node))
 	if config["dev"]: #Developer printout
 		print "#[DEV] %s was not derived"%node
 	#if not quiet and force_flag:
