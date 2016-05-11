@@ -51,7 +51,7 @@ Python package NumPy
 -------------------
 progressiveMauve
 -------------------
-	http://gel.ahabs.wisc.edu/mauve/
+	http://darlinglab.org/mauve/mauve.html
 	The progressiveMauve binary must be in the PATH or specifically set in 
 	the CanSNPer.conf file.
 
