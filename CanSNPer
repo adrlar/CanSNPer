@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 '''
 CanSNPer: A toolkit for SNP-typing using NGS data.
-Copyright (C) 2013 Adrian Lärkeryd
+Copyright (C) 2016 Adrian Lärkeryd
 
-VERSION 1.05
+VERSION 1.06
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ def parse_arguments():
 	
 	cansnper_description = '''
 	CanSNPer: A toolkit for SNP-typing using NGS data.
-	Copyright (C) 2015 Adrian Lärkeryd.
+	Copyright (C) 2016 Adrian Lärkeryd.
 
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -117,7 +117,7 @@ def read_config(args):
 	'''
 	user = getpass.getuser()
 	
-	version = 1.05
+	version = 1.06
 	
 	config_list = {"tmp_path":"string","db_path":"string","mauve_path":"string",
 		"x2fa_path":"string","num_threads":"int","verbose":"boolean","allow_differences":"int",
@@ -365,6 +365,7 @@ def import_sequence(file_name):
 	whether or not to update the sequence entry.
 
 	'''
+	print file_name
 	seq_file = open(file_name, "r")
 	seq = "".join(seq_file.read().split("\n")[1:])
 	seq_file.close()
@@ -569,28 +570,35 @@ def draw_ete2_tree(organism, snplist, tree_file_name):
 	tree = Tree(newick, format=1)
 	tree_depth = int(tree.get_distance(tree.get_farthest_leaf()[0]))
 	for n in tree.traverse():
-		# Nodes are set to grey colour
+		# Nodes are set to red colour
 		nstyle = NodeStyle()
-		nstyle["fgcolor"] = "#DDDDDD"
-		nstyle["size"] = 5
-		nstyle["vt_line_color"] = "#DDDDDD"
-		nstyle["hz_line_color"] = "#DDDDDD"
-		nstyle["vt_line_type"] = 1
-		nstyle["hz_line_type"] = 1
+		nstyle["fgcolor"] = "#BE0508"
+		nstyle["size"] = 10
+		nstyle["vt_line_color"] = "#000000"
+		nstyle["hz_line_color"] = "#000000"
+		nstyle["vt_line_type"] = 0
+		nstyle["hz_line_type"] = 0
 		nstyle["vt_line_width"] = 2
 		nstyle["hz_line_width"] = 2
 		for snp in snplist:
 			if n.name == snp[0]:
 				if snp[1] == snp[3]:
 					# If the SNP is Derived in snplist, change appearance of node
-					nstyle["fgcolor"] = "#BE0508"
+					nstyle["fgcolor"] = "#99FF66"
 					nstyle["size"] = 15
 					nstyle["vt_line_color"] = "#000000"
 					nstyle["hz_line_color"] = "#000000"
 					nstyle["vt_line_type"] = 0
 					nstyle["hz_line_type"] = 0
+				elif snp[3] == "-":
+					#If the SNP is missing due to a gap, make it grey
+					nstyle["fgcolor"] = "#DDDDDD"
+					nstyle["size"] = 10
+					nstyle["vt_line_color"] = "#DDDDDD"
+					nstyle["hz_line_color"] = "#DDDDDD"
+					nstyle["vt_line_type"] = 1
+					nstyle["hz_line_type"] = 1
 		n.set_style(nstyle)
-	
 	ts = TreeStyle()
 	ts.show_leaf_name = False # Do not print leaf names, they are added in layout
 	ts.show_scale = False # Do not show the scale
@@ -748,8 +756,7 @@ def multi_tree_walker(node, sequences, organism, threshold, wrong_list, force_fl
 			message = "#[ERROR in %s] SNP position of %s listed in strain that is not in the database: %s"%(config["query"],node,str(e.message))
 			exit(message)
 	else:
-		if not quiet:
-			stderr.write("#[WARNING in %s] SNP not in database: %s\n"%(config["query"], node))
+		stderr.write("#[WARNING in %s] SNP not in database: %s\n"%(config["query"], node))
 	if config["dev"]: #Developer printout
 		print "#[DEV] %s was not derived"%node
 	#if not quiet and force_flag:
@@ -790,7 +797,7 @@ def mauve_error_check(num):
 	mauve_errors_file.close()	
 
 	if mauve_errors: #Quit if there was something wrong
-		exit("#[ERROR in %s] progressiveMauve failed to complete:\n%s"%(config["query"],mauve_errors))
+		exit("#[ERROR in %s] progressiveMauve filed to complete:\n%s"%(config["query"],mauve_errors))
 	
 	#Remove the file if there were no errors, annoying to have an empty file lying around
 	silent_remove("%s/CanSNPer_err%s.txt"%(config["tmp_path"],num))
@@ -900,6 +907,7 @@ def align(file_name):
 			fasta_name = reference_sequences[i]
 		else:
 			fasta_name = seq_uids[i]
+		fasta_name_readable = reference_sequences[i]
 		alignment_file = open("%s.%s.fa"%(output, fasta_name), "r")
 		sequences = alignment_file.read().split(">")[1:]
 		alignment_file.close()
@@ -910,6 +918,8 @@ def align(file_name):
 		for j in range(0,len(reference)):
 			if reference[j] == alternate[j]:
 				identity_counter += 1
+		if config["verbose"]:
+			print "#Seq identity with %s: %.2f%s"%(fasta_name_readable,float(identity_counter)/float(len(reference))*100, "%")
 		if float(identity_counter)/float(len(reference)) < 0.8:
 			WARNINGS["ALIGNMENT_WARNING"] = "#[WARNING in %s] Sequence identity between %s and a reference strain of"%(config["query"],out_name) +\
 				" %s was only %.2f percent"%(db_name, float(identity_counter)/float(len(reference))*100)
