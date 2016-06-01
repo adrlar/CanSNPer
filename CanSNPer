@@ -790,7 +790,7 @@ def mauve_error_check(num):
 	mauve_errors_file.close()	
 
 	if mauve_errors: #Quit if there was something wrong
-		exit("#[ERROR in %s] progressiveMauve filed to complete:\n%s"%(config["query"],mauve_errors))
+		exit("#[ERROR in %s] progressiveMauve failed to complete:\n%s"%(config["query"],mauve_errors))
 	
 	#Remove the file if there were no errors, annoying to have an empty file lying around
 	silent_remove("%s/CanSNPer_err%s.txt"%(config["tmp_path"],num))
