@@ -1,3 +1,12 @@
+2016-06-01  Adrian Lärkeryd & Andreas Sjödin <andreas.sjodin@foi.se>
+        CanSNPer version 1.06
+        * (draw_ete2_tree)
+        Improve the coloring by making missing SNPs due to gaps to by colored grey .
+        * (align)
+        Print percent similarity between sequences for verbose mode.
+
+
+
 2015-01-19  Adrian Lärkeryd  <adrian.larkeryd@foi.se>
 	CanSNPer version 1.05
 	* (multi_tree_walker)
