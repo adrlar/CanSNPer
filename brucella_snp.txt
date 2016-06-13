@@ -1,0 +1,25 @@
+#SNP	Organism	Reference	Genome	Genome_Position	Derived_base	Ancestral_base
+Root	brucella	NA	16M_I	1399301	A	G	
+2366A	brucella	Foster et al 2012	16M_I	1173418	C	T
+4748B	brucella	Foster et al 2012	16M_I	1744204	T	G
+1562B	brucella	Foster et al 2012	16M_I	1405278	C	G
+2922C	brucella	Foster et al 2012	16M_I	413932	A	C
+991C	brucella	Foster et al 2012	16M_I	1601478	T	G
+3740D	brucella	Foster et al 2012	16M_I	675902	T	C
+1344D	brucella	Foster et al 2012	16M_I	1392401	T	C
+5754E	brucella	Foster et al 2012	16M_I	1083475	T	C
+1522E	brucella	Foster et al 2012	16M_I	497531	T	C
+6214F	brucella	Foster et al 2012	16M_II	242221	C	T
+2995G	brucella	Foster et al 2012	16M_II	478180	G	C
+8872G	brucella	Foster et al 2012	16M_I	1170582	T	C
+1688H	brucella	Foster et al 2012	16M_I	1348435	A	T
+5362I	brucella	Foster et al 2012	16M_I	507272	T	C
+8306I	brucella	Foster et al 2012	16M_I	1876817	T	C
+10621J	brucella	Foster et al 2012	16M_I	1207540	T	C
+abc_205	brucella	Foster et al 2008	16M_I	573136	A	C
+abc_246	brucella	Foster et al 2008	16M_I	573177	C	G
+cysW_234	brucella	Foster et al 2008	16M_I	696894	C	G
+cysW_288	brucella	Foster et al 2008	16M_I	696948	A	C
+omp25_256	brucella	Foster et al 2008	16M_I	1297911	T	G
+rpoB_2673	brucella	Foster et al 2008	16M_I	776263	T	G
+trpE_290	brucella	Foster et al 2008	16M_I	468289	A	G
