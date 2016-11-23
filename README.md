@@ -15,13 +15,13 @@ CanSNPer -h
 Sometimes CanSNPer will want more information from you, such as the name of the 
 organism you want to use as a reference when aligning. This is done by a prompt 
 where you type the answer in and press enter to submit. If you are ever stuck 
-in a prompt or dont know what to enter, type 'exit' to exit.
-
-Note that not all information that CanSNPer needs can be given interactively.
-File names can only be given as a command argument.
+in a prompt or dont know what to enter, type 'exit' to exit. 
+  
+Note that not all information that CanSNPer needs can be given interactively. 
+File names can only be given as a command argument. 
 
 ##Running the usual analysis 
-CanSNPer takes a fasta file as input, using the argument -i or `--snp_type_file` 
+CanSNPer takes a fasta file as input, using the argument `-i` or `--snp_type_file`  
 with the file name:
 
 ```
@@ -41,7 +41,7 @@ If you want to change the output of CanSNPer use the arguments `--tab_sep (-t)`,
 will type fasta.fa with Y. pestis as reference, print the outcome in a tab 
 separated format, create a text file with all SNPs listed, draw a canSNP tree 
 and save it as a PDF file and CanSNPer will print whatever it is doing (because 
-we used all the -t, -l, -d and -v options):
+we used all the `-t`, `-l`, `-d` and `-v` options):
 
 ```
 CanSNPer -i fasta.fa -r Yersinia_pestis -tldv
@@ -53,7 +53,7 @@ needs. However, If there are several reference strains to align to (as in the
 case of Fracisella tularensis) the alignments of the query to each reference 
 are all assigned their own thread. That is, unless the user specifies a 
 MAXIMUM number of threads to use. The default value is no limit (0). This 
-option is called -n.
+option is called `-n`.
 
 ```
 CanSNPer -i fasta.fa -r Yersinia_pestis -n2
@@ -79,10 +79,10 @@ Classification of BROKEN.fa: B.24
 #[WARNING] these SNPs were not in the derived state: B.3
 ```
 ##Configuring CanSNPer.conf
-The configuration file, by default called CanSNPer.conf is a text file 
-containing all settings and by default CanSNPer will look for it in the folder 
-where CanSNPer is run from. You can also specify the location of the 
-configuration file on the command line with the -c or `--config_file` argument as 
+The configuration file, by default called CanSNPer.conf is a text file  
+containing all settings and by default CanSNPer will look for it in the folder  
+where CanSNPer is run from. You can also specify the location of the  
+configuration file on the command line with the -c or `--config_file` argument as  
 such:
 
 ```
@@ -151,12 +151,12 @@ CanSNPer -r Yersinia_pestis --import_seq_file CO92.fa --strain_name CO92
 ```
 
 ##Formatting a canSNP tree text file for CanSNPer
-The format that CanSNPer accepts as a tree is very simple.
-1. The first line MUST contain the root of the tree.
+The format that CanSNPer accepts as a tree is very simple.  
+1. The first line MUST contain the root of the tree.  
 2. All subsequent lines represent one intermediate or leaf node in the tree. It 
 is listed with all its ancestors in order, separated by semi-colons, with the 
 node name at the end.
-
+  
 This formatting creates a tree that is easy to inspect in text form, in any 
 editor.
 
