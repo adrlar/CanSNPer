@@ -59,7 +59,7 @@ option is called -n.
 CanSNPer -i fasta.fa -r Yersinia_pestis -n2
 ```
 
-##The --allow_differences argument
+##The `--allow_differences` argument
 This argument allows CanSNPer to pass through a number of canSNP tree nodes 
 even if the SNP is not in a derived state. The number of nodes that are 
 permitted to be wrong is stated after `--allow_differences`. This option can be 
@@ -75,8 +75,9 @@ This may produce a warning, in addition to the classification, letting you
 know which SNPs (if any) were not in the derived state in the canSNP tree:
 
 Classification of BROKEN.fa: B.24
+```
 #[WARNING] these SNPs were not in the derived state: B.3
-
+```
 ##Configuring CanSNPer.conf
 The configuration file, by default called CanSNPer.conf is a text file 
 containing all settings and by default CanSNPer will look for it in the folder 
@@ -90,9 +91,9 @@ CanSNPer --config_file /path/to/CanSNPer.conf
 
 With no configuration file CanSNPer will try with its default settings and you 
 will get a warning like this:
-
+```
 #[WARNING] No config file found: [Errno X] ...
-
+```
 For instructions on what to write in the CanSNPer.conf file, see the example 
 file that came with the distribution of CanSNPer.
 
@@ -186,8 +187,9 @@ following order: SNP name, Organism name, Reference, Strain, Position, Derived
 base, Ancestral base
 
 Here is an example:
+```
 B.1	Francisella	Svensson	LVS	23942	A	G
-
+```
 The header line is not needed and any line beginning with a '#' will be 
 considered a comment line. The order of derived and ancestral state is of 
 particular importance because there is no way for CanSNPer to tell the columns 
@@ -220,6 +222,7 @@ appreciated.
 
 ##Citing CanSNPer 
 The first verion of CanSNPer is published in Bioinformatics.
-
+```
 Lärkeryd A, Myrtennäs K, Karlsson E, Dwibedi CK, Forsman M, Larsson P, Johansson A, Sjödin A: 
 CanSNPer: a hierarchical genotype classifier of clonal pathogens. Bioinformatics 2014
+```
