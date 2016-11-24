@@ -34,17 +34,17 @@ a working version on your favorite OS. Mauve is available on other platforms.
 ##Dependencies
 Software that must be installed before running CanSNPer:
 
-[Python (2.7.X)](http://www.python.org/getit/)
+[Python (2.7.X)](http://www.python.org/getit/)  
 Most Linux distributions come with Python installed.
 
-[ETE2](http://ete.cgenomics.org/)
+[ETE2](http://ete.cgenomics.org/)  
 ETE2 has a number of additional dependencies, listed in their install 
 notes. Most notably, there are several dependencies that are not needed 
 for CanSNPer, but they may raise warnings as ETE2 is loaded.
 
-[NumPy](http://www.numpy.org/)
+[NumPy](http://www.numpy.org/)  
 Simple install instructions are available for this package.
 
-[progressiveMauve](http://darlinglab.org/mauve/mauve.html)
+[progressiveMauve](http://darlinglab.org/mauve/mauve.html)  
 The progressiveMauve binary must be in the PATH or specifically set in 
 the CanSNPer.conf file.
