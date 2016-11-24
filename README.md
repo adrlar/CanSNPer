@@ -4,9 +4,9 @@ dependencies listed in the INSTALL document. Consult that file for detailed
 installation instructions. When the dependencies are all installed CanSNPer can 
 be run as it is from the shell.
 
-##Running CanSNPer 
-All CanSNPer runs start with the main CanSNPer script. Assuming it is in your 
-PATH, try to invoke the CanSNPer help with this command:
+##Running CanSNPer
+All CanSNPer runs start with the main CanSNPer script. Following installation,
+try to invoke the CanSNPer help with this command:
 
 ```
 CanSNPer -h
@@ -22,18 +22,11 @@ File names can only be given as a command argument.
 
 ##Running the usual analysis 
 CanSNPer takes a fasta file as input, using the argument `-i` or `--snp_type_file`  
-with the file name:
+with the file name, the reference organism is given with the argument `--reference (-r)` and the
+path to the CanSNPer database is given with the `--db_path (-b)`:
 
 ```
-CanSNPer --snp_type_file /path/to/fasta.fa
-```
-
-CanSNPer will give you an option to choose which reference organism you want to 
-use. If you want to give the reference as a command line argument, use 
-`--reference` or `-r` followed by the reference name.
-
-```
-CanSNPer -i /path/to/fasta.fa -r Francisella_tularensis
+CanSNPer --snp_type_file /path/to/fasta.fa -r Yersinia_pestis -b CanSNPerDB.db
 ```
 
 If you want to change the output of CanSNPer use the arguments `--tab_sep (-t)`, 
@@ -78,24 +71,6 @@ Classification of BROKEN.fa: B.24
 ```
 #[WARNING] these SNPs were not in the derived state: B.3
 ```
-##Configuring CanSNPer.conf
-The configuration file, by default called CanSNPer.conf is a text file  
-containing all settings and by default CanSNPer will look for it in the folder  
-where CanSNPer is run from. You can also specify the location of the  
-configuration file on the command line with the -c or `--config_file` argument as  
-such:
-
-```
-CanSNPer --config_file /path/to/CanSNPer.conf
-```
-
-With no configuration file CanSNPer will try with its default settings and you 
-will get a warning like this:
-```
-#[WARNING] No config file found: [Errno X] ...
-```
-For instructions on what to write in the CanSNPer.conf file, see the example 
-file that came with the distribution of CanSNPer.
 
 ##Setting up, or changing a CanSNPer database
 A database complete with the current information is available with the CanSNPer 
