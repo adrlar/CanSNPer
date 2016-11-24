@@ -349,9 +349,9 @@ def initialise_table(config, c):
         exit("#[ERROR in %s] SQLite OperationalError: %s" % (config["query"], str(e)))
 
 
-def purge_organism(c):
+def purge_organism(config, c):
     '''Removes everything in the SQLite3 database connected to a organism.'''
-    db_name = get_organism()
+    db_name = get_organism(config)
     if raw_input("Delete everything concerning %s? (Y/N) " % db_name).lower()[0] == "y":
         c.execute("DROP TABLE %s" % db_name)
         c.execute("DELETE FROM Sequences WHERE Organism = ?", (db_name, ))
@@ -1048,7 +1048,7 @@ def main():
         align(config["query"], config, c)
 
     if config["delete_organism"]:
-        purge_organism(c)
+        purge_organism(config, c)
 
     cnx.commit()
     c.close()
