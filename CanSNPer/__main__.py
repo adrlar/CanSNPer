@@ -27,6 +27,7 @@ import errno
 import inspect
 import getpass
 import time
+import pkg_resources
 
 import argparse
 import re
@@ -63,8 +64,8 @@ def parse_arguments():
                         help="the name of the organism")
     parser.add_argument("-i", "--query",
                         help="fasta sequence file name that is to be analysed")
-    parser.add_argument("-c", "--config_file",
-                        help="path to a CanSNPer configuration file")
+    parser.add_argument("-b", "--db_path",
+                        help="path to CanSNPerDB.db")
     parser.add_argument("--import_tree_file",
                         help="imports a tree structure into the database")
     parser.add_argument("--import_snp_file",
@@ -84,6 +85,8 @@ def parse_arguments():
     parser.add_argument("-d", "--draw_tree", action="store_true",
                         help="draw a pdf version of the tree, marking SNPs " +
                         "of the query sequence")
+    parser.add_argument("-m", "--progressiveMauve",
+                        help="path to progressiveMauve binary file")
     parser.add_argument("-l", "--list_snps", action="store_true",
                         help="lists the SNPs of the given sequence")
     parser.add_argument("-v", "--verbose", action="store_true",
@@ -101,6 +104,8 @@ def parse_arguments():
                         "concerning an organism")
     parser.add_argument("-initialise_organism", action="store_true",
                         help="initialise a new table for an organism")
+    parser.add_argument("-f", "--tmp_path",
+                        help="where temporary files are stored")
     parser.add_argument("-q", "--dev", action="store_true", help="dev mode")
     parser.add_argument("--galaxy", action="store_true",
                         help="argument used if Galaxy is running CanSNPer, " +
@@ -146,18 +151,14 @@ def read_config(args):
                    "reference": "string",
                    "tab_sep": "boolean",
                    "dev": "boolean",
-                   "galaxy": "boolean"}
+                   "galaxy": "boolean",
+                   "db_path": "string"}
 
     config = dict()
-    if args.config_file:
-        config["config_file"] = args.config_file
-    else:
-        config["config_file"] = "%s/CanSNPer.conf" % \
-                                path.dirname(path.abspath(inspect.getfile(inspect.currentframe())))
 
     # Default settings
     config["tmp_path"] = "/tmp/CanSNPer_%s/" % user
-    config["db_path"] = path.expanduser("~") + "/CanSNPerDB.db"
+    config["db_path"] = path.expanduser("~") + "/CanSNPer.db"
     config["mauve_path"] = "progressiveMauve"  # In your PATH
     config["x2fa_path"] = "x2fa.py"  # In your PATH
     config["allow_differences"] = 0
@@ -170,32 +171,6 @@ def read_config(args):
     config["reference"] = None
     config["dev"] = False
     config["galaxy"] = False
-
-    # Read config file
-    try:
-        config_file_open = open(config["config_file"], "r")
-        for line in config_file_open:
-            if line[0] != "#" and line.strip() != "" and "=" in line:
-                argument = line.split("=")
-                argument_name = argument[0].strip()
-                argument_value = argument[1].strip()
-                if argument_name in config_list.keys():
-                    if config_list[argument_name] == "int":
-                        argument_value = int(argument_value)
-                    elif config_list[argument_name] == "boolean":
-                        if argument_value.lower() == "true":
-                            argument_value = True
-                        else:
-                            argument_value = False
-                    if argument_name == "tmp_path":
-                        argument_value = argument_value + "/"
-                    config[argument_name] = argument_value
-        config_file_open.close()
-    except IOError as e:
-        stderr.write("#[WARNING in %s] No config file found: %s\n" %
-                     (config["query"], str(e)))
-
-    # Not in config file
     config["query"] = None
     config["import_tree_file"] = None
     config["import_snp_file"] = None
@@ -211,6 +186,8 @@ def read_config(args):
         config["reference"] = args.reference
     if args.query:
         config["query"] = args.query
+    if args.db_path:
+        config["db_path"] = args.db_path
     if args.import_tree_file:
         config["import_tree_file"] = args.import_tree_file
     if args.import_snp_file:
@@ -225,6 +202,8 @@ def read_config(args):
         config["tab_sep"] = True
     if args.draw_tree:
         config["draw_tree"] = True
+    if args.progressiveMauve:
+        config["mauve_path"] = args.progressiveMauve
     if args.list_snps:
         config["list_snps"] = True
     if args.verbose:
@@ -239,7 +218,8 @@ def read_config(args):
         config["initialise_organism"] = True
     if args.galaxy:
         config["galaxy"] = True
-
+    if args.tmp_path:
+        config["tmp_path"] = args.tmp_path
     if config["dev"]:  # Developer printout
         print("#[DEV] configurations:%s" % config)
     if config["verbose"]:
