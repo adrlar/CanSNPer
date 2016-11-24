@@ -158,7 +158,7 @@ def read_config(args):
 
     # Default settings
     config["tmp_path"] = "/tmp/CanSNPer_%s/" % user
-    config["db_path"] = path.expanduser("~") + "/CanSNPer.db"
+    config["db_path"] = path.expanduser("~") + "/CanSNPerDB.db"
     config["mauve_path"] = "progressiveMauve"  # In your PATH
     config["x2fa_path"] = "x2fa.py"  # In your PATH
     config["allow_differences"] = 0
@@ -229,7 +229,7 @@ def read_config(args):
     return config
 
 
-def get_organism(config):
+def get_organism(config, c):
     '''Returns the organism name chosen.
 
     If it was supplied as an argument, this is returned,
@@ -240,7 +240,7 @@ def get_organism(config):
     if config["reference"]:
         return config["reference"]
     else:
-        return select_table()
+        return select_table(c)
 
 
 def get_strain(organism, config, c):
@@ -349,9 +349,9 @@ def initialise_table(config, c):
         exit("#[ERROR in %s] SQLite OperationalError: %s" % (config["query"], str(e)))
 
 
-def purge_organism(c):
+def purge_organism(config, c):
     '''Removes everything in the SQLite3 database connected to a organism.'''
-    db_name = get_organism()
+    db_name = get_organism(config, c)
     if raw_input("Delete everything concerning %s? (Y/N) " % db_name).lower()[0] == "y":
         c.execute("DROP TABLE %s" % db_name)
         c.execute("DELETE FROM Sequences WHERE Organism = ?", (db_name, ))
@@ -384,7 +384,7 @@ def import_sequence(file_name, config, c):
         message = "#[ERROR in %s] You have a non-ATCGN character in your sequence file at position  % d" % (config["query"], validation_search.end() + 1)
         exit(message)
 
-    organism_name = get_organism(config)
+    organism_name = get_organism(config, c)
     strain_name = get_strain(organism_name, config, c)
 
     # Checking for entries with this strain name
@@ -423,7 +423,7 @@ def import_to_db(file_name, config, c):
     Organism-name isnt used at the moment, the table name is the organism name.
 
     '''
-    db_name = get_organism(config)
+    db_name = get_organism(config, c)
 
     snp_file = open(file_name, "r")
 
@@ -472,7 +472,7 @@ def import_tree(file_name, config, c):
     (N1,(N3,N4,(N6)N5)N2)ROOT;
 
     '''
-    organism_name = get_organism(config)
+    organism_name = get_organism(config, c)
     tree_file = open(file_name, "r")
     text_tree = tree_file.readlines()
     # Truncate the table
@@ -831,7 +831,7 @@ def align(file_name, config, c):
     WARNINGS = dict()
 
     # Get database and output name
-    db_name = get_organism(config)
+    db_name = get_organism(config, c)
     out_name = file_name.split("/")[-1]
     output = "%s/%s.CanSNPer" % (config["tmp_path"], out_name)
 
@@ -1031,7 +1031,7 @@ def main():
 
     # Run the apropriate functions
     if config["initialise_organism"]:
-        initialise_table()
+        initialise_table(config, c)
 
     if config["import_snp_file"]:
         import_to_db(config["import_snp_file"], config, c)
@@ -1048,7 +1048,7 @@ def main():
         align(config["query"], config, c)
 
     if config["delete_organism"]:
-        purge_organism(c)
+        purge_organism(config, c)
 
     cnx.commit()
     c.close()
