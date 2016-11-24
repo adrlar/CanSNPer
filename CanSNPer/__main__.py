@@ -1031,7 +1031,7 @@ def main():
 
     # Run the apropriate functions
     if config["initialise_organism"]:
-        initialise_table()
+        initialise_table(config, c)
 
     if config["import_snp_file"]:
         import_to_db(config["import_snp_file"], config, c)
