@@ -158,7 +158,7 @@ def read_config(args):
 
     # Default settings
     config["tmp_path"] = "/tmp/CanSNPer_%s/" % user
-    config["db_path"] = path.expanduser("~") + "/CanSNPer.db"
+    config["db_path"] = path.expanduser("~") + "/CanSNPerDB.db"
     config["mauve_path"] = "progressiveMauve"  # In your PATH
     config["x2fa_path"] = "x2fa.py"  # In your PATH
     config["allow_differences"] = 0
