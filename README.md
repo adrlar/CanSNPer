@@ -197,7 +197,37 @@ appreciated.
 
 ##Citing CanSNPer 
 The first verion of CanSNPer is published in Bioinformatics.
+
 ```
 Lärkeryd A, Myrtennäs K, Karlsson E, Dwibedi CK, Forsman M, Larsson P, Johansson A, Sjödin A: 
 CanSNPer: a hierarchical genotype classifier of clonal pathogens. Bioinformatics 2014
 ```
+
+Depending on which canonical SNPs that are used to classify your strain some the following 
+publications should also be cited. More information about were each CanSNP is publiched may 
+be found in snp.txt file for each genus. 
+
+__Francisella references__
+
+- Birdsell, D. N. et al. Francisella tularensis subsp. tularensis Group A.I, United States. Emerg. Infect. Dis. 20, 861–865 (2014).
+- Chanturia, G. et al. Phylogeography of Francisella tularensis subspecies holarctica from the country of Georgia. BMC Microbiol. 11, 139 (2011).
+- Dwibedi, C. et al. Long-range dispersal moved Francisella tularensis into western Europe from the East. Microbial Genomics (2016)
+- Gyuranecz, M. et al. Phylogeography of Francisella tularensis subsp. holarctica, Europe. Emerg. Infect. Dis. 18, 290–3 (2012).
+- Karadenizli, a et al. Genomic analyses of Francisella tularensis strains confirm disease transmission from drinking water sources, Turkey, 2008, 2009 and 2012. Eurosurveillance 20, 21136 (2015).
+- Karlsson, E. et al. The phylogeographic pattern of Francisella tularensis in Sweden indicates a Scandinavian origin of Eurosiberian tularaemia. Environ. Microbiol. 15, 634–645 (2013).
+- Myrtennäs, K. et al. Introduction and persistence of tularemia in Bulgaria. Infect. Ecol. Epidemiol. 6, 1–9 (2016).
+- Schulze, C. et al. High and novel genetic diversity of Francisella tularensis in Germany and indication of environmental persistence. Epidemiol. Infect. 144, 3025–3036 (2016).
+- Svensson, K. et al. A real-time PCR array for hierarchical identification of Francisella isolates. PLoS One 4, e8360 (2009).
+- Vogler, A. J. et al. Phylogeography of Francisella tularensis: global expansion of a highly fit clone. J. Bacteriol. 191, 2474–84 (2009).
+
+__Bacillus__
+- Van Ert, M. N. et al. Global genetic population structure of Bacillus anthracis. PLoS One 2, e461 (2007).
+
+__Brucella__
+- Foster, J. T. et al. Real-time PCR assays of single-nucleotide polymorphisms defining the major Brucella clades. J. Clin. Microbiol. 46, 296–301 (2008).
+
+__Coxiella__
+- Karlsson, E. et al. Eight New Genomes and Synthetic Controls Increase the Accessibility of Rapid Melt-MAMA SNP Typing of Coxiella burnetii. PLoS One 9, e85417 (2014).
+
+__Yersinia__
+- Morelli, G. et al. Yersinia pestis genome sequencing identifies patterns of global phylogenetic diversity. Nat. Genet. 42, 1140–3 (2010).
