@@ -136,7 +136,7 @@ def read_config(args):
     '''
     user = getpass.getuser()
 
-    version = 1.0.7
+    version = '1.0.7'
 
     config_list = {"tmp_path": "string",
                    "db_path": "string",
