@@ -1,4 +1,9 @@
 2016-11-25  Emil Hägglund <emil.hagglund@foi.se> & Andreas Sjödin <andreas.sjodin@foi.se>
+        CanSNPer version 1.0.8
+        * bug fix release
+        Minor release to fix rumtime bug introduced in 1.0.7
+
+2016-11-25  Emil Hägglund <emil.hagglund@foi.se> & Andreas Sjödin <andreas.sjodin@foi.se>
         CanSNPer version 1.0.7
         * setup.py
         Major rearrangement of of the code to allow installation using setup.py.
