@@ -21,7 +21,7 @@ Note that not all information that CanSNPer needs can be given interactively.
 File names can only be given as a command argument. 
 
 ##Running the usual analysis 
-CanSNPer takes a fasta file as input, using the argument `-i` or `--snp_type_file`  
+CanSNPer takes a fasta file as input, using the argument  `--snp_type_file (-i)`  
 with the file name, the reference organism is given with the argument `--reference (-r)` and the
 path to the CanSNPer database is given with the `--db_path (-b)`:
 
@@ -37,7 +37,7 @@ and save it as a PDF file and CanSNPer will print whatever it is doing (because
 we used all the `-t`, `-l`, `-d` and `-v` options):
 
 ```
-CanSNPer -i fasta.fa -r Yersinia_pestis -tldv
+CanSNPer -i fasta.fa -r Yersinia_pestis -tldv -b CanSNPerDB.db
 ```
 
 ##Threads
@@ -49,7 +49,7 @@ MAXIMUM number of threads to use. The default value is no limit (0). This
 option is called `-n`.
 
 ```
-CanSNPer -i fasta.fa -r Yersinia_pestis -n2
+CanSNPer -i fasta.fa -r Yersinia_pestis -b CanSNPerDB -n2 
 ```
 
 ##The `--allow_differences` argument
@@ -61,7 +61,7 @@ this will cause CanSNPer to overlook information. Use this option only if you
 are certain of the effects on the outcome. Here is an example:
 
 ```
-CanSNPer -i BROKEN.fa --allow_differences 1
+CanSNPer -i BROKEN.fa --allow_differences 1 -b CanSNPerDB.db
 ```
 
 This may produce a warning, in addition to the classification, letting you 
@@ -84,26 +84,26 @@ specified in CanSNPer.conf (default is in your home folder). When you want to
 add a new organism to your database, use the -initialise_organism argument:
 
 ```
-CanSNPer -initialise_organism
+CanSNPer -initialise_organism -b CanSNPerDB.db
 ```
 
-CanSNPer will ask for an organism name if you did not supply one using the -r 
+CanSNPer will ask for an organism name if you did not supply one using the `-r` 
 argument.
 
 After initialising an organism you can start to add information to it. To add 
 the list of SNPs use the `--import_snp_file` argument and supply the text-file. 
-If you did not supply the -r argument CanSNPer will ask which organism this 
+If you did not supply the `-r` argument CanSNPer will ask which organism this 
 data belongs to.
 
 ```
-CanSNPer -r Yersinia_pestis --import_snp_file y_snps.txt
+CanSNPer -r Yersinia_pestis --import_snp_file y_snps.txt -b CanSNPerDB.db
 ```
 
 Next, if you want to upload a new, or update an existingcanSNP tree, use 
 `--import_tree_file`. The tree in the CanSNPer database will be replaced:
 
 ```
-CanSNPer -r Yersinia_pestis --import_tree_file y_tree.txt
+CanSNPer -r Yersinia_pestis --import_tree_file y_tree.txt -b CanSNPerDB.db
 ```
 
 The last database altering option in CanSNPer allows you to import a fasta 
@@ -112,7 +112,7 @@ the reference strains that are used in the SNP table. You can only import one
 at a time, though:
 
 ```
-CanSNPer -r Yersinia_pestis --import_seq_file CO92.fa
+CanSNPer -r Yersinia_pestis --import_seq_file CO92.fa -b CanSNPerDB.db
 ```
 
 CanSNPer list the reference strains that are in the SNP list, and you choose 
@@ -122,7 +122,7 @@ With the `--import_seq_file` argument you can also add the `--strain_name` and t
 CanSNPer what the strain name is without having to go through the prompt:
 
 ```
-CanSNPer -r Yersinia_pestis --import_seq_file CO92.fa --strain_name CO92
+CanSNPer -r Yersinia_pestis -b CanSNPerDB.db --import_seq_file CO92.fa --strain_name CO92 
 ```
 
 ##Formatting a canSNP tree text file for CanSNPer
@@ -197,7 +197,37 @@ appreciated.
 
 ##Citing CanSNPer 
 The first verion of CanSNPer is published in Bioinformatics.
+
 ```
 Lärkeryd A, Myrtennäs K, Karlsson E, Dwibedi CK, Forsman M, Larsson P, Johansson A, Sjödin A: 
 CanSNPer: a hierarchical genotype classifier of clonal pathogens. Bioinformatics 2014
 ```
+
+Depending on which canonical SNPs that are used to classify your strain some the following 
+publications should also be cited. More information about were each CanSNP is publiched may 
+be found in snp.txt file for each genus. 
+
+__Francisella references__
+
+- Birdsell, D. N. et al. Francisella tularensis subsp. tularensis Group A.I, United States. Emerg. Infect. Dis. 20, 861–865 (2014).
+- Chanturia, G. et al. Phylogeography of Francisella tularensis subspecies holarctica from the country of Georgia. BMC Microbiol. 11, 139 (2011).
+- Dwibedi, C. et al. Long-range dispersal moved Francisella tularensis into western Europe from the East. Microbial Genomics (2016)
+- Gyuranecz, M. et al. Phylogeography of Francisella tularensis subsp. holarctica, Europe. Emerg. Infect. Dis. 18, 290–3 (2012).
+- Karadenizli, a et al. Genomic analyses of Francisella tularensis strains confirm disease transmission from drinking water sources, Turkey, 2008, 2009 and 2012. Eurosurveillance 20, 21136 (2015).
+- Karlsson, E. et al. The phylogeographic pattern of Francisella tularensis in Sweden indicates a Scandinavian origin of Eurosiberian tularaemia. Environ. Microbiol. 15, 634–645 (2013).
+- Myrtennäs, K. et al. Introduction and persistence of tularemia in Bulgaria. Infect. Ecol. Epidemiol. 6, 1–9 (2016).
+- Schulze, C. et al. High and novel genetic diversity of Francisella tularensis in Germany and indication of environmental persistence. Epidemiol. Infect. 144, 3025–3036 (2016).
+- Svensson, K. et al. A real-time PCR array for hierarchical identification of Francisella isolates. PLoS One 4, e8360 (2009).
+- Vogler, A. J. et al. Phylogeography of Francisella tularensis: global expansion of a highly fit clone. J. Bacteriol. 191, 2474–84 (2009).
+
+__Bacillus__
+- Van Ert, M. N. et al. Global genetic population structure of Bacillus anthracis. PLoS One 2, e461 (2007).
+
+__Brucella__
+- Foster, J. T. et al. Real-time PCR assays of single-nucleotide polymorphisms defining the major Brucella clades. J. Clin. Microbiol. 46, 296–301 (2008).
+
+__Coxiella__
+- Karlsson, E. et al. Eight New Genomes and Synthetic Controls Increase the Accessibility of Rapid Melt-MAMA SNP Typing of Coxiella burnetii. PLoS One 9, e85417 (2014).
+
+__Yersinia__
+- Morelli, G. et al. Yersinia pestis genome sequencing identifies patterns of global phylogenetic diversity. Nat. Genet. 42, 1140–3 (2010).

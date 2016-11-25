@@ -4,7 +4,7 @@
 CanSNPer: A toolkit for SNP-typing using NGS data.
 Copyright (C) 2016 Adrian Lärkeryd
 
-VERSION 1.06
+VERSION 1.0.7
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -136,7 +136,7 @@ def read_config(args):
     '''
     user = getpass.getuser()
 
-    version = 1.06
+    version = 1.0.7
 
     config_list = {"tmp_path": "string",
                    "db_path": "string",
