@@ -205,7 +205,7 @@ CanSNPer: a hierarchical genotype classifier of clonal pathogens. Bioinformatics
 
 Depending on which canonical SNPs that are used to classify your strain some the following 
 publications should also be cited. More information about were each CanSNP is publiched may 
-be found in _snp.txt for each genus. 
+be found in snp.txt file for each genus. 
 
 __Francisella references__
 
