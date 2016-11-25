@@ -21,7 +21,7 @@ Note that not all information that CanSNPer needs can be given interactively.
 File names can only be given as a command argument. 
 
 ##Running the usual analysis 
-CanSNPer takes a fasta file as input, using the argument `-i` or `--snp_type_file`  
+CanSNPer takes a fasta file as input, using the argument  `--snp_type_file (-i)`  
 with the file name, the reference organism is given with the argument `--reference (-r)` and the
 path to the CanSNPer database is given with the `--db_path (-b)`:
 
@@ -37,7 +37,7 @@ and save it as a PDF file and CanSNPer will print whatever it is doing (because
 we used all the `-t`, `-l`, `-d` and `-v` options):
 
 ```
-CanSNPer -i fasta.fa -r Yersinia_pestis -tldv
+CanSNPer -i fasta.fa -r Yersinia_pestis -tldv -b CanSNPerDB.db
 ```
 
 ##Threads
@@ -49,7 +49,7 @@ MAXIMUM number of threads to use. The default value is no limit (0). This
 option is called `-n`.
 
 ```
-CanSNPer -i fasta.fa -r Yersinia_pestis -n2
+CanSNPer -i fasta.fa -r Yersinia_pestis -b CanSNPerDB -n2 
 ```
 
 ##The `--allow_differences` argument
@@ -61,7 +61,7 @@ this will cause CanSNPer to overlook information. Use this option only if you
 are certain of the effects on the outcome. Here is an example:
 
 ```
-CanSNPer -i BROKEN.fa --allow_differences 1
+CanSNPer -i BROKEN.fa --allow_differences 1 -b CanSNPerDB.db
 ```
 
 This may produce a warning, in addition to the classification, letting you 
@@ -84,26 +84,26 @@ specified in CanSNPer.conf (default is in your home folder). When you want to
 add a new organism to your database, use the -initialise_organism argument:
 
 ```
-CanSNPer -initialise_organism
+CanSNPer -initialise_organism -b CanSNPerDB.db
 ```
 
-CanSNPer will ask for an organism name if you did not supply one using the -r 
+CanSNPer will ask for an organism name if you did not supply one using the `-r` 
 argument.
 
 After initialising an organism you can start to add information to it. To add 
 the list of SNPs use the `--import_snp_file` argument and supply the text-file. 
-If you did not supply the -r argument CanSNPer will ask which organism this 
+If you did not supply the `-r` argument CanSNPer will ask which organism this 
 data belongs to.
 
 ```
-CanSNPer -r Yersinia_pestis --import_snp_file y_snps.txt
+CanSNPer -r Yersinia_pestis --import_snp_file y_snps.txt -b CanSNPerDB.db
 ```
 
 Next, if you want to upload a new, or update an existingcanSNP tree, use 
 `--import_tree_file`. The tree in the CanSNPer database will be replaced:
 
 ```
-CanSNPer -r Yersinia_pestis --import_tree_file y_tree.txt
+CanSNPer -r Yersinia_pestis --import_tree_file y_tree.txt -b CanSNPerDB.db
 ```
 
 The last database altering option in CanSNPer allows you to import a fasta 
@@ -112,7 +112,7 @@ the reference strains that are used in the SNP table. You can only import one
 at a time, though:
 
 ```
-CanSNPer -r Yersinia_pestis --import_seq_file CO92.fa
+CanSNPer -r Yersinia_pestis --import_seq_file CO92.fa -b CanSNPerDB.db
 ```
 
 CanSNPer list the reference strains that are in the SNP list, and you choose 
@@ -122,7 +122,7 @@ With the `--import_seq_file` argument you can also add the `--strain_name` and t
 CanSNPer what the strain name is without having to go through the prompt:
 
 ```
-CanSNPer -r Yersinia_pestis --import_seq_file CO92.fa --strain_name CO92
+CanSNPer -r Yersinia_pestis -b CanSNPerDB.db --import_seq_file CO92.fa --strain_name CO92 
 ```
 
 ##Formatting a canSNP tree text file for CanSNPer
