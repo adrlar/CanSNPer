@@ -1,3 +1,13 @@
+2016-11-25  Emil Hägglund <emil.hagglund@foi.se> & Andreas Sjödin <andreas.sjodin@foi.se>
+        CanSNPer version 1.0.7
+        * setup.py
+        Major rearrangement of of the code to allow installation using setup.py.
+        * Francisella
+        Added B.44-B-80 describing the Iberian, Orebro, Bulgarian and Finish isolates.
+        * Brucella
+        First version of Brucella CanSNPer support. 
+
+
 2016-06-01  Adrian Lärkeryd & Andreas Sjödin <andreas.sjodin@foi.se>
         CanSNPer version 1.06
         * (draw_ete2_tree)
