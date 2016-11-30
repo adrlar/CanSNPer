@@ -24,4 +24,3 @@ while getopts ":i::r::b:" opt; do
 done
 
 xvfb-run CanSNPer -i $INPUT -r $REFERENCE -b $DB -d
-
