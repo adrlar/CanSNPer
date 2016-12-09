@@ -19,7 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
-from sys import stderr, argv, version_info
+from sys import stderr, argv, version_info, exit
 from os import path, remove, makedirs, getcwd
 from shutil import copy as shutil_copy
 from uuid import uuid4
@@ -158,7 +158,7 @@ def read_config(args):
 
     # Default settings
     config["tmp_path"] = "/tmp/CanSNPer_%s/" % user
-    config["db_path"] = path.expanduser("~") + "/CanSNPerDB.db"
+    config["db_path"] = None
     config["mauve_path"] = "progressiveMauve"  # In your PATH
     config["x2fa_path"] = "x2fa.py"  # In your PATH
     config["allow_differences"] = 0
@@ -958,7 +958,7 @@ def align(file_name, config, c):
 
     if config["list_snps"]:  # Make a raw list of which SNPs the sequence has
         snp_out_file = open("%s_snplist.txt" % file_name, "w")
-        snplist = snp_lister(alternates, db_name, out_name)
+        snplist = snp_lister(alternates, db_name, out_name, config, c)
         for snp in snplist:
             snp_out_file.write("\t".join(snp) + "\n")
         snp_out_file.close()
@@ -1018,41 +1018,50 @@ def align(file_name, config, c):
 
 def main():
     config = parse_arguments()
-
+    
+    db_open = False
     # Open sqlite3 connection
-    if not path.isfile(config["db_path"]):
-        print("Trying to create new database at %s" % config["db_path"])
-    try:
-        cnx = sqlite3.connect(config["db_path"])
-        c = cnx.cursor()
-    except sqlite3.OperationalError as e:
-        exit("#[ERROR in %s] Could not open database at %s:\n%s" % (config["query"],
-             config["db_path"], str(e)))
+    if config["db_path"] is not None:
+        if not path.isfile(config["db_path"]):
+            print("Trying to create new database at %s" % config["db_path"])
+        try:
+            cnx = sqlite3.connect(config["db_path"])
+            c = cnx.cursor()
+            db_open = True
+        except sqlite3.OperationalError as e:
+            exit("#[ERROR in %s] Could not open database at %s:\n%s" % (config["query"],
+                 config["db_path"], str(e)))
 
-    # Run the apropriate functions
-    if config["initialise_organism"]:
-        initialise_table(config, c)
+    # Check that the db is available before running
+    if db_open:
+        # Run the apropriate functions
+        if config["initialise_organism"]:
+            initialise_table(config, c)
 
-    if config["import_snp_file"]:
-        import_to_db(config["import_snp_file"], config, c)
+        if config["import_snp_file"]:
+            import_to_db(config["import_snp_file"], config, c)
 
-    if config["import_tree_file"]:
-        import_tree(config["import_tree_file"], config, c)
+        if config["import_tree_file"]:
+            import_tree(config["import_tree_file"], config, c)
 
-    if config["import_seq_file"]:
-        import_sequence(config["import_seq_file"], config, c)
+        if config["import_seq_file"]:
+            import_sequence(config["import_seq_file"], config, c)
 
-    if config["query"]:
-        if config["verbose"]:
-            print("#Starting %s ..." % config["query"])
-        align(config["query"], config, c)
+        if config["query"]:
+            if config["verbose"]:
+                print("#Starting %s ..." % config["query"])
+            align(config["query"], config, c)
 
-    if config["delete_organism"]:
-        purge_organism(config, c)
-
-    cnx.commit()
-    c.close()
-    cnx.close()
+        if config["delete_organism"]:
+            purge_organism(config, c)
+    else:
+        exit("#[ERROR] Did not find any open database connection")
+    
+    # If the database is been open, close it
+    if db_open:
+        cnx.commit()
+        c.close()
+        cnx.close()
 
 if __name__ == '__main__':
     main()
