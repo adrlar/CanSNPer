@@ -1,8 +1,11 @@
+[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat-square)](http://bioconda.github.io/recipes/cansnper/README.html)
+
 ##Installing CanSNPer 
 CanSNPer is written in Python and requires Python installed as well as several 
-dependencies listed in the INSTALL document. Consult that file for detailed 
-installation instructions. When the dependencies are all installed CanSNPer can 
-be run as it is from the shell.
+dependencies. The easiest way to install CanSNPer is using 
+[Bioconda conda](https://bioconda.github.io/recipes/cansnper/README.html) channel 
+or with pip. Consult the INSTALL document for detailed installation instructions. 
+When the dependencies are all installed CanSNPer can be run as it is from the shell.
 
 ##Running CanSNPer
 All CanSNPer runs start with the main CanSNPer script. Following installation,
