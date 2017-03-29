@@ -7,7 +7,7 @@ if sys.version_info[:2] != (2, 7):
 
 setup(
     name="CanSNPer",
-    version="1.0.8",
+    version="1.0.9",
     url="https://github.com/adrlar/CanSNPer",
     description="CanSNPer: A toolkit for SNP-typing using NGS data.",
     license="GPL'",

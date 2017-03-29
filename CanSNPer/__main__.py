@@ -4,7 +4,7 @@
 CanSNPer: A toolkit for SNP-typing using NGS data.
 Copyright (C) 2016 Adrian Lärkeryd
 
-VERSION 1.0.8
+VERSION 1.0.9
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -376,7 +376,9 @@ def import_sequence(file_name, config, c):
     seq_file = open(file_name, "r")
     seq = "".join(seq_file.read().split("\n")[1:])
     seq_file.close()
-
+    print(seq)
+    print(len(seq))
+    print("Here is error")
     # Going to search for ATCGN and see if that is all we find
     sequence_validation_regex = re.compile("[ATCGN]+")
     validation_search = sequence_validation_regex.search(seq)
