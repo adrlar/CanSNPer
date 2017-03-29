@@ -376,9 +376,7 @@ def import_sequence(file_name, config, c):
     seq_file = open(file_name, "r")
     seq = "".join(seq_file.read().split("\n")[1:])
     seq_file.close()
-    print(seq)
-    print(len(seq))
-    print("Here is error")
+
     # Going to search for ATCGN and see if that is all we find
     sequence_validation_regex = re.compile("[ATCGN]+")
     validation_search = sequence_validation_regex.search(seq)
