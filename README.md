@@ -1,13 +1,13 @@
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat-square)](http://bioconda.github.io/recipes/cansnper/README.html)
 
-##Installing CanSNPer 
+## Installing CanSNPer
 CanSNPer is written in Python and requires Python installed as well as several 
 dependencies. The easiest way to install CanSNPer is using 
 [Bioconda conda](https://bioconda.github.io/recipes/cansnper/README.html) channel 
 or with pip. Consult the INSTALL document for detailed installation instructions. 
 When the dependencies are all installed CanSNPer can be run as it is from the shell.
 
-##Running CanSNPer
+## Running CanSNPer
 All CanSNPer runs start with the main CanSNPer script. Following installation,
 try to invoke the CanSNPer help with this command:
 
@@ -23,7 +23,7 @@ in a prompt or dont know what to enter, type 'exit' to exit.
 Note that not all information that CanSNPer needs can be given interactively. 
 File names can only be given as a command argument. 
 
-##Running the usual analysis 
+## Running the usual analysis 
 CanSNPer takes a fasta file as input, using the argument  `--snp_type_file (-i)`  
 with the file name, the reference organism is given with the argument `--reference (-r)` and the
 path to the CanSNPer database is given with the `--db_path (-b)`:
@@ -43,7 +43,7 @@ we used all the `-t`, `-l`, `-d` and `-v` options):
 CanSNPer -i fasta.fa -r Yersinia_pestis -tldv -b CanSNPerDB.db
 ```
 
-##Threads
+## Threads
 CanSNPer is fairly lightweight in terms of how much computational power it 
 needs. However, If there are several reference strains to align to (as in the 
 case of Fracisella tularensis) the alignments of the query to each reference 
@@ -55,7 +55,7 @@ option is called `-n`.
 CanSNPer -i fasta.fa -r Yersinia_pestis -b CanSNPerDB -n2 
 ```
 
-##The `--allow_differences` argument
+## The `--allow_differences` argument
 This argument allows CanSNPer to pass through a number of canSNP tree nodes 
 even if the SNP is not in a derived state. The number of nodes that are 
 permitted to be wrong is stated after `--allow_differences`. This option can be 
@@ -75,7 +75,7 @@ Classification of BROKEN.fa: B.24
 #[WARNING] these SNPs were not in the derived state: B.3
 ```
 
-##Setting up, or changing a CanSNPer database
+## Setting up, or changing a CanSNPer database
 A database complete with the current information is available with the CanSNPer 
 distribution, but if you want to create a separate DB, or add to yours, here 
 are some CanSNPer command line arguments that will help. The formatting of the 
@@ -128,7 +128,7 @@ CanSNPer what the strain name is without having to go through the prompt:
 CanSNPer -r Yersinia_pestis -b CanSNPerDB.db --import_seq_file CO92.fa --strain_name CO92 
 ```
 
-##Formatting a canSNP tree text file for CanSNPer
+## Formatting a canSNP tree text file for CanSNPer
 The format that CanSNPer accepts as a tree is very simple.  
 1. The first line MUST contain the root of the tree.  
 2. All subsequent lines represent one intermediate or leaf node in the tree. It 
@@ -159,7 +159,7 @@ Root;SNP1
 Root;SNP2
 Root;SNP1;SNP3
 ```
-##Formatting a SNP list text file for CanSNPer
+## Formatting a SNP list text file for CanSNPer
 The SNP list is a tab separated text file and must have the information in the 
 following order: SNP name, Organism name, Reference, Strain, Position, Derived 
 base, Ancestral base
@@ -177,7 +177,7 @@ The column Organism name is not used by CanSNPer at this moment, but is kept in
 order to ease any future work with the file formats and import functions. It 
 can be left out, but there must then be two tabs between SNP name and Reference.
 
-##Running CanSNPer in Galaxy
+## Running CanSNPer in Galaxy
 There is a Galaxy tool definition file available with the Github CanSNPer 
 distribution called CanSNPer.xml. Place this file along with the CanSNPer main 
 script and the CanSNPer.conf in the Galaxy tools folder and make sure to edit 
@@ -198,7 +198,7 @@ The CanSNPer galaxy tool is largely untested and feedback is greatly
 appreciated.
 
 
-##Citing CanSNPer 
+## Citing CanSNPer 
 The first verion of CanSNPer is published in Bioinformatics.
 
 ```
@@ -210,7 +210,7 @@ Depending on which canonical SNPs that are used to classify your strain some the
 publications should also be cited. More information about were each CanSNP is publiched may 
 be found in snp.txt file for each genus. 
 
-__Francisella references__
+__Francisella__
 
 - Birdsell, D. N. et al. Francisella tularensis subsp. tularensis Group A.I, United States. Emerg. Infect. Dis. 20, 861–865 (2014).
 - Chanturia, G. et al. Phylogeography of Francisella tularensis subspecies holarctica from the country of Georgia. BMC Microbiol. 11, 139 (2011).
