@@ -67,6 +67,17 @@ B.77	Franciella_tularensis	Myrtennas_2016	SCHUS4.2	1802833	A	G
 B.78	Franciella_tularensis	Myrtennas_2016	SCHUS4.2	1634094	C	T
 B.79	Franciella_tularensis	Myrtennas_2016	SCHUS4.2	1661376	A	G
 B.80	Franciella_tularensis	Busch_2016	FSC200	769711	T	C
+B.82	Franciella_tularensis	Wittwer2018	OSU18	460154	A	C
+B.83	Franciella_tularensis	Wittwer2018	OSU18	131680	T	C
+B.84	Franciella_tularensis	Wittwer2018	OSU18	78059	T	C
+B.85	Franciella_tularensis	Wittwer2018	OSU18	946694	T	G
+B.86	Franciella_tularensis	Wittwer2018	OSU18	565202	T	C
+B.87	Franciella_tularensis	Wittwer2018	OSU18	701708	A	G
+B.88	Franciella_tularensis	Wittwer2018	OSU18	1368846	A	G
+B.89	Franciella_tularensis	Wittwer2018	OSU18	1836061	A	G
+B.90	Franciella_tularensis	Wittwer2018	OSU18	483810	T	A
+B.91	Franciella_tularensis	Wittwer2018	OSU18	1356642	G	A
+B.92	Franciella_tularensis	Wittwer2018	OSU18	861484	A	G
 M.1	Franciella_tularensis	Vogler_2009	SCHUS4.1	75124	T	C
 M.2	Franciella_tularensis	Svensson_2009	SCHUS4.1	84027	C	T
 A/M.1	Franciella_tularensis	Vogler_2009	SCHUS4.2	1491914	A	G
