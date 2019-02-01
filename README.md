@@ -222,6 +222,7 @@ __Francisella__
 - Schulze, C. et al. High and novel genetic diversity of Francisella tularensis in Germany and indication of environmental persistence. Epidemiol. Infect. 144, 3025–3036 (2016).
 - Svensson, K. et al. A real-time PCR array for hierarchical identification of Francisella isolates. PLoS One 4, e8360 (2009).
 - Vogler, A. J. et al. Phylogeography of Francisella tularensis: global expansion of a highly fit clone. J. Bacteriol. 191, 2474–84 (2009).
+- Wittwer, M et al. Population Genomics of Francisella tularensis subsp. holarctica and its Implication on the Eco-Epidemiology of Tularemia in Switzerland. Front Cell Infect Microbiol. 8: 89. (2018).
 
 __Bacillus__
 - Van Ert, M. N. et al. Global genetic population structure of Bacillus anthracis. PLoS One 2, e461 (2007).
