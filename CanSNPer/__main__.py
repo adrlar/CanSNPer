@@ -4,7 +4,7 @@
 CanSNPer: A toolkit for SNP-typing using NGS data.
 Copyright (C) 2016 Adrian Lärkeryd
 
-VERSION 1.0.9
+VERSION 1.0.10
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -35,11 +35,7 @@ import sqlite3
 
 from subprocess import Popen
 
-if version_info[0] < 3:
-    from ete2 import Tree, faces, AttrFace, TreeStyle, NodeStyle
-else:
-    from ete3 import Tree, faces, AttrFace, TreeStyle, NodeStyle
-
+import ete2
 
 def parse_arguments():
     '''Parses arguments from the command line and sends them to read_config
@@ -561,9 +557,9 @@ def tree_to_newick(organism, config, c):
 
 def CanSNPer_tree_layout(node):
     '''Layout style for ETE2 trees.'''
-    name_face = AttrFace("name")
+    name_face = ete2.AttrFace("name")
     # Adds the name face to the image at the top side of the branch
-    faces.add_face_to_node(name_face, node, column=0, position="branch-top")
+    ete2.faces.add_face_to_node(name_face, node, column=0, position="branch-top")
 
 
 def draw_ete2_tree(organism, snplist, tree_file_name, config, c):
