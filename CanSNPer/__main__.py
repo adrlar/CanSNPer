@@ -572,11 +572,11 @@ def draw_ete2_tree(organism, snplist, tree_file_name, config, c):
 
     '''
     newick = tree_to_newick(organism, config, c)
-    tree = Tree(newick, format=1)
+    tree = ete2.Tree(newick, format=1)
     tree_depth = int(tree.get_distance(tree.get_farthest_leaf()[0]))
     for n in tree.traverse():
         # Nodes are set to red colour
-        nstyle = NodeStyle()
+        nstyle = ete2.NodeStyle()
         nstyle["fgcolor"] = "#BE0508"
         nstyle["size"] = 10
         nstyle["vt_line_color"] = "#000000"
@@ -605,7 +605,7 @@ def draw_ete2_tree(organism, snplist, tree_file_name, config, c):
                     nstyle["vt_line_type"] = 1
                     nstyle["hz_line_type"] = 1
         n.set_style(nstyle)
-    ts = TreeStyle()
+    ts = ete2.TreeStyle()
     ts.show_leaf_name = False  # Do not print(leaf names, they are added in layout)
     ts.show_scale = False  # Do not show the scale
     ts.layout_fn = CanSNPer_tree_layout  # Use the custom layout
