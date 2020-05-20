@@ -1,3 +1,11 @@
+# UPDATE May 2020
+The current release of CanSNPer (v1.0.10) will be the latest and all development is now focused on [CanSNPer2](https://github.com/FOI-Bioinformatics/CanSNPer2-data). 
+
+Please consider swapping to CanSNPer2. 
+
+ 
+-------------------------------------------------------------------------------------- 
+ 
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat-square)](http://bioconda.github.io/recipes/cansnper/README.html)
 
 ## Installing CanSNPer
